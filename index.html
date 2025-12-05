@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>My Drive Files</title>
-
+    <title>Drive Link App</title>
     <link rel="stylesheet" href="style.css">
 
     <!-- Firebase -->
@@ -12,65 +10,55 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
-
 <body>
 
 <div class="container">
 
-    <h1>My Drive Files</h1>
+<h2>Drive Link App</h2>
 
-    <!-- LOGIN PAGE -->
-    <div id="loginPage">
-        <button onclick="showAdminLogin()">Admin Login</button>
-        <button onclick="showUserLogin()">User Login</button>
-    </div>
+<!-- HOME -->
+<div id="loginPage">
+    <button onclick="showAdminLogin()">Admin Login</button>
+    <button onclick="showUserLogin()">User Login</button>
+</div>
 
-    <!-- ADMIN LOGIN -->
-    <div id="adminLogin" class="hidden">
-        <h2>Admin Login</h2>
-        <input id="adminEmail" type="email" placeholder="Admin Email">
-        <input id="adminPass" type="password" placeholder="Admin Password">
-        <button onclick="adminLogin()">Login</button>
-        <button onclick="backHome()">Back</button>
-    </div>
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="hidden">
+    <input id="adminEmail" type="email" placeholder="Admin Email">
+    <input id="adminPass" type="password" placeholder="Admin Password">
+    <button onclick="adminLogin()">Login</button>
+    <button onclick="backHome()">Back</button>
+</div>
 
-    <!-- USER LOGIN -->
-    <div id="userLogin" class="hidden">
-        <h2>User Login</h2>
-        <input id="userPassLogin" type="password" placeholder="User Password">
-        <button onclick="userLogin()">Login</button>
-        <button onclick="backHome()">Back</button>
-    </div>
+<!-- USER LOGIN -->
+<div id="userLogin" class="hidden">
+    <input id="userPassLogin" type="password" placeholder="User Password">
+    <button onclick="userLogin()">Login</button>
+    <button onclick="backHome()">Back</button>
+</div>
 
-    <!-- ADMIN PANEL -->
-    <div id="adminPanel" class="hidden">
-        <h2>Admin Panel</h2>
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="hidden">
+    <h3>Admin Panel</h3>
 
-        <h3>Set / Change User Password</h3>
-        <input id="newUserPass" type="text" placeholder="New User Password">
-        <button onclick="updateUserPassword()">Update Password</button>
+    <input id="newUserPass" type="text" placeholder="Set User Password">
+    <button onclick="updateUserPassword()">Update Password</button>
 
-        <h3>Add New File</h3>
-        <input id="fileTitle" type="text" placeholder="File Title">
-        <input id="fileLink" type="text" placeholder="Google Drive File Link">
-        <button onclick="addFile()">Add File</button>
+    <input id="fileTitle" type="text" placeholder="File Name">
+    <input id="fileLink" type="text" placeholder="Drive Link">
+    <button onclick="addFile()">Add File</button>
 
-        <h3>Files List</h3>
-        <div id="adminFiles"></div>
+    <div id="adminFiles"></div>
 
-        <button onclick="logout()">Logout</button>
-    </div>
+    <button onclick="logout()">Logout</button>
+</div>
 
-    <!-- USER PANEL -->
-    <div id="userPanel" class="hidden">
-        <h2>User Panel</h2>
-
-        <input id="searchBox" type="text" placeholder="Search..." oninput="searchFiles()">
-
-        <div id="userFiles"></div>
-
-        <button onclick="logout()">Logout</button>
-    </div>
+<!-- USER PANEL -->
+<div id="userPanel" class="hidden">
+    <input id="searchBox" placeholder="Search..." onkeyup="searchFiles()">
+    <div id="userFiles"></div>
+    <button onclick="logout()">Logout</button>
+</div>
 
 </div>
 
