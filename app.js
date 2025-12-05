@@ -1,77 +1,75 @@
-// Firebase Config
+// ✅ Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCFQErfyzr2oiap8epvdkiImSoWCyLdjb0",
   authDomain: "my-family-pic.firebaseapp.com",
   databaseURL: "https://my-family-pic-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "my-family-pic",
-  storageBucket: "my-family-pic.firebasestorage.app",
+  storageBucket: "my-family-pic.appspot.com",
   messagingSenderId: "1016445913558",
   appId: "1:1016445913558:web:b4b8e620494e5cc4f23c77"
 };
 
 firebase.initializeApp(firebaseConfig);
-
-// Shortcuts
 const db = firebase.database();
+
+// ✅ UI CONTROL
+function hideAll() {
+    loginPage.classList.add("hidden");
+    adminLogin.classList.add("hidden");
+    userLogin.classList.add("hidden");
+    adminPanel.classList.add("hidden");
+    userPanel.classList.add("hidden");
+}
 
 function showAdminLogin() {
     hideAll();
-    adminLogin.style.display = "block";
+    adminLogin.classList.remove("hidden");
 }
 
 function showUserLogin() {
     hideAll();
-    userLogin.style.display = "block";
+    userLogin.classList.remove("hidden");
 }
 
 function backHome() {
     hideAll();
-    loginPage.style.display = "block";
+    loginPage.classList.remove("hidden");
 }
 
-function hideAll() {
-    loginPage.style.display = "none";
-    adminLogin.style.display = "none";
-    userLogin.style.display = "none";
-    adminPanel.style.display = "none";
-    userPanel.style.display = "none";
-}
-
-// ADMIN LOGIN
+// ✅ ADMIN LOGIN SYSTEM
 function adminLogin() {
     let email = adminEmail.value;
     let pass = adminPass.value;
 
     firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => {
-            loadAdminFiles();
-            hideAll();
-            adminPanel.style.display = "block";
-        })
-        .catch(() => alert("Wrong admin login!"));
+    .then(() => {
+        hideAll();
+        adminPanel.classList.remove("hidden");
+        loadAdminFiles();
+    })
+    .catch(() => alert("Wrong Admin Login"));
 }
 
-// USER LOGIN
+// ✅ USER LOGIN SYSTEM
 function userLogin() {
     db.ref("userPassword").once("value", snapshot => {
-        let saved = snapshot.val();
-        if (saved === userPassLogin.value) {
-            loadUserFiles();
+        if (snapshot.val() === userPassLogin.value) {
             hideAll();
-            userPanel.style.display = "block";
+            userPanel.classList.remove("hidden");
+            loadUserFiles();
         } else {
-            alert("Wrong password!");
+            alert("Wrong User Password");
         }
     });
 }
 
-// USER PASSWORD UPDATE (ADMIN)
+// ✅ UPDATE USER PASSWORD
 function updateUserPassword() {
     db.ref("userPassword").set(newUserPass.value);
-    alert("User password updated");
+    alert("User Password Updated");
 }
 
-// ADD FILE
+// ✅ ADD FILE
 function addFile() {
     let title = fileTitle.value;
     let link = fileLink.value;
@@ -86,57 +84,55 @@ function addFile() {
     loadAdminFiles();
 }
 
-// DELETE FILE
+// ✅ DELETE FILE
 function deleteFile(id) {
     db.ref("files/" + id).remove();
     loadAdminFiles();
 }
 
-// LOAD ADMIN FILES
+// ✅ LOAD FILES IN ADMIN
 function loadAdminFiles() {
-    db.ref("files").on("value", snapshot => {
+    db.ref("files").on("value", snap => {
         adminFiles.innerHTML = "";
-        snapshot.forEach(child => {
-            let data = child.val();
-            adminFiles.innerHTML += `
-                <div class="fileBox">
-                    <b>${data.title}</b>  
-                    <br>
+        snap.forEach(child => {
+            let file = child.val();
+            adminFiles.innerHTML += 
+                <div class="file">
+                    ${file.title}
                     <button onclick="deleteFile('${child.key}')">Delete</button>
                 </div>
-            `;
+            ;
         });
     });
 }
 
-// LOAD USER FILES
+// ✅ LOAD FILES IN USER
 function loadUserFiles() {
-    db.ref("files").on("value", snapshot => {
+    db.ref("files").on("value", snap => {
         userFiles.innerHTML = "";
-        snapshot.forEach(child => {
-            let data = child.val();
-            userFiles.innerHTML += `
-                <div class="fileBox">
-                    <b>${data.title}</b><br>
-                    <a href="${data.link}" target="_blank">Open</a>
+        snap.forEach(child => {
+            let file = child.val();
+            userFiles.innerHTML += 
+                <div class="file">
+                    ${file.title}
+                    <a href="${file.link}" target="_blank">Open</a>
                 </div>
-            `;
+            ;
         });
     });
 }
 
-// SEARCH
+// ✅ SEARCH SYSTEM
 function searchFiles() {
     let text = searchBox.value.toLowerCase();
-    document.querySelectorAll("#userFiles .fileBox").forEach(box => {
-        box.style.display = 
-            box.innerText.toLowerCase().includes(text) ? "block" : "none";
+    document.querySelectorAll(".file").forEach(file => {
+        file.style.display = file.innerText.toLowerCase().includes(text) ? "block" : "none";
     });
 }
 
-// LOGOUT
+// ✅ LOGOUT
 function logout() {
     firebase.auth().signOut();
     hideAll();
-    loginPage.style.display = "block";
+    loginPage.classList.remove("hidden");
 }
