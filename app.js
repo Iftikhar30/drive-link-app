@@ -9,11 +9,13 @@ import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, deleteD
 const firebaseConfig = {
   apiKey: "AIzaSyCFQErfyzr2oiap8epvdkiImSoWCyLdjb0",
   authDomain: "my-family-pic.firebaseapp.com",
+  databaseURL: "https://my-family-pic-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "my-family-pic",
   storageBucket: "my-family-pic.firebasestorage.app",
   messagingSenderId: "1016445913558",
   appId: "1:1016445913558:web:b4b8e620494e5cc4f23c77"
 };
+
 
 // initialize
 const app = initializeApp(firebaseConfig);
@@ -157,3 +159,4 @@ async function sha256(message){
 
 // Notes: This simple approach stores file URLs in Firestore and shows only name+button in user UI.
 // Admin must create initial admin user via Firebase Console > Authentication > Users (create user)
+
