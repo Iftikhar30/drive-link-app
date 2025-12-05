@@ -2,64 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Family App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Drive Files</title>
+
     <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
+
 <body>
 
-    <h2 class="title">My Family Drive</h2>
+<div class="container">
 
-    <div class="container">
+    <h1>My Drive Files</h1>
 
-        <button id="adminBtn">Admin Login</button>
-        <button id="userBtn">User Login</button>
-
-        <!-- Admin Login Form -->
-        <div id="adminLogin" class="hidden">
-            <h3>Admin Login</h3>
-            <input type="text" id="adminEmail" placeholder="Email">
-            <input type="password" id="adminPass" placeholder="Password">
-            <button id="adminLoginBtn">Login</button>
-        </div>
-
-        <!-- User Login -->
-        <div id="userLogin" class="hidden">
-            <h3>User Login</h3>
-            <input type="password" id="userPass" placeholder="Enter User Password">
-            <button id="userLoginBtn">Login</button>
-        </div>
-
-        <!-- Admin Panel -->
-        <div id="adminPanel" class="hidden">
-            <h3>Admin Panel</h3>
-            <input type="text" id="fileName" placeholder="File Name">
-            <input type="text" id="fileUrl" placeholder="Direct File URL">
-            <button id="addFileBtn">Add File</button>
-
-            <h3>Uploaded Files</h3>
-            <ul id="adminFileList"></ul>
-
-            <button id="logoutBtn">Logout</button>
-        </div>
-
-        <!-- User Panel -->
-        <div id="userPanel" class="hidden">
-            <h3>Shared Files</h3>
-            <ul id="userFileList"></ul>
-
-            <button id="logoutBtn2">Logout</button>
-        </div>
-
+    <!-- LOGIN PAGE -->
+    <div id="loginPage">
+        <button onclick="showAdminLogin()">Admin Login</button>
+        <button onclick="showUserLogin()">User Login</button>
     </div>
-    <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
+    <!-- ADMIN LOGIN -->
+    <div id="adminLogin" class="hidden">
+        <h2>Admin Login</h2>
+        <input id="adminEmail" type="email" placeholder="Admin Email">
+        <input id="adminPass" type="password" placeholder="Admin Password">
+        <button onclick="adminLogin()">Login</button>
+        <button onclick="backHome()">Back</button>
+    </div>
+
+    <!-- USER LOGIN -->
+    <div id="userLogin" class="hidden">
+        <h2>User Login</h2>
+        <input id="userPassLogin" type="password" placeholder="User Password">
+        <button onclick="userLogin()">Login</button>
+        <button onclick="backHome()">Back</button>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="hidden">
+        <h2>Admin Panel</h2>
+
+        <h3>Set / Change User Password</h3>
+        <input id="newUserPass" type="text" placeholder="New User Password">
+        <button onclick="updateUserPassword()">Update Password</button>
+
+        <h3>Add New File</h3>
+        <input id="fileTitle" type="text" placeholder="File Title">
+        <input id="fileLink" type="text" placeholder="Google Drive File Link">
+        <button onclick="addFile()">Add File</button>
+
+        <h3>Files List</h3>
+        <div id="adminFiles"></div>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- USER PANEL -->
+    <div id="userPanel" class="hidden">
+        <h2>User Panel</h2>
+
+        <input id="searchBox" type="text" placeholder="Search..." oninput="searchFiles()">
+
+        <div id="userFiles"></div>
+
+        <button onclick="logout()">Logout</button>
+    </div>
+
+</div>
 
 <script src="app.js"></script>
-
 </body>
 </html>
-
