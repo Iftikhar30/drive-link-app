@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Drive File App</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase CDN (modular v9+) -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>My Drive Files</h1>
+      <div class="header-actions">
+        <button id="btn-admin-login">Admin Login</button>
+        <button id="btn-user-login">User Login</button>
+      </div>
+    </header>
+
+    <!-- Login areas -->
+    <div id="login-area">
+      <!-- User login (password only) -->
+      <div id="user-login" class="card hidden">
+        <h2>User Login</h2>
+        <input id="user-password" type="password" placeholder="আপনার পাসওয়ার্ড দিন" />
+        <button id="user-login-btn">Login</button>
+      </div>
+
+      <!-- Admin login (email + password) -->
+      <div id="admin-login" class="card hidden">
+        <h2>Admin Login</h2>
+        <input id="admin-email" type="email" placeholder="Admin Email" />
+        <input id="admin-password" type="password" placeholder="Admin Password" />
+        <button id="admin-login-btn">Login as Admin</button>
+      </div>
+    </div>
+
+    <!-- Main App Area -->
+    <main id="app-area" class="hidden">
+
+      <!-- Admin Panel -->
+      <section id="admin-panel" class="card hidden">
+        <h2>Admin Panel</h2>
+        <div class="admin-row">
+          <div>
+            <label>File name</label>
+            <input id="add-name" placeholder="File name" />
+            <label>Google Drive share link (Anyone with link)</label>
+            <input id="add-url" placeholder="https://drive.google.com/file/d/FILEID/view?usp=sharing" />
+            <button id="add-file-btn">Add File</button>
+          </div>
+          <div>
+            <label>Change User Password</label>
+            <input id="new-user-pass" type="password" placeholder="New user password" />
+            <button id="change-user-pass-btn">Change Password</button>
+          </div>
+        </div>
+
+        <h3>Existing files</h3>
+        <div id="admin-files"></div>
+        <button id="admin-logout">Logout Admin</button>
+      </section>
+
+      <!-- User Panel -->
+      <section id="user-panel" class="card hidden">
+        <h2>User Panel</h2>
+        <input id="search" placeholder="Search files..." />
+        <div id="file-list"></div>
+        <button id="user-logout">Logout</button>
+      </section>
+
+    </main>
+
+    <footer>
+      <small>Created by you — host frontend on GitHub Pages and backend on Firebase</small>
+    </footer>
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
