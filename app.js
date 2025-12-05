@@ -1,98 +1,142 @@
-// Your Firebase Config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCFQErfyzr2oiap8epvdkiImSoWCyLdjb0",
   authDomain: "my-family-pic.firebaseapp.com",
   databaseURL: "https://my-family-pic-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "my-family-pic",
-  storageBucket: "my-family-pic.appspot.com",
+  storageBucket: "my-family-pic.firebasestorage.app",
   messagingSenderId: "1016445913558",
   appId: "1:1016445913558:web:b4b8e620494e5cc4f23c77"
 };
 
 firebase.initializeApp(firebaseConfig);
+
+// Shortcuts
 const db = firebase.database();
 
-// UI Elements
-const adminBtn = document.getElementById("adminBtn");
-const userBtn = document.getElementById("userBtn");
-const adminLogin = document.getElementById("adminLogin");
-const userLogin = document.getElementById("userLogin");
-const adminPanel = document.getElementById("adminPanel");
-const userPanel = document.getElementById("userPanel");
+function showAdminLogin() {
+    hideAll();
+    adminLogin.style.display = "block";
+}
 
-// Login Buttons
-adminBtn.onclick = () => {
-    adminLogin.classList.remove("hidden");
-    userLogin.classList.add("hidden");
-};
+function showUserLogin() {
+    hideAll();
+    userLogin.style.display = "block";
+}
 
-userBtn.onclick = () => {
-    userLogin.classList.remove("hidden");
-    adminLogin.classList.add("hidden");
-};
+function backHome() {
+    hideAll();
+    loginPage.style.display = "block";
+}
 
-// Admin Login
-document.getElementById("adminLoginBtn").onclick = () => {
-    const email = document.getElementById("adminEmail").value;
-    const pass = document.getElementById("adminPass").value;
+function hideAll() {
+    loginPage.style.display = "none";
+    adminLogin.style.display = "none";
+    userLogin.style.display = "none";
+    adminPanel.style.display = "none";
+    userPanel.style.display = "none";
+}
+
+// ADMIN LOGIN
+function adminLogin() {
+    let email = adminEmail.value;
+    let pass = adminPass.value;
 
     firebase.auth().signInWithEmailAndPassword(email, pass)
         .then(() => {
-            adminPanel.classList.remove("hidden");
-            adminLogin.classList.add("hidden");
+            loadAdminFiles();
+            hideAll();
+            adminPanel.style.display = "block";
         })
-        .catch(() => alert("Wrong Admin Login!"));
-};
+        .catch(() => alert("Wrong admin login!"));
+}
 
-// User Login (Simple password)
-document.getElementById("userLoginBtn").onclick = () => {
-    const pass = document.getElementById("userPass").value;
+// USER LOGIN
+function userLogin() {
+    db.ref("userPassword").once("value", snapshot => {
+        let saved = snapshot.val();
+        if (saved === userPassLogin.value) {
+            loadUserFiles();
+            hideAll();
+            userPanel.style.display = "block";
+        } else {
+            alert("Wrong password!");
+        }
+    });
+}
 
-    if (pass === "1122") {
-        userPanel.classList.remove("hidden");
-        userLogin.classList.add("hidden");
-    } else {
-        alert("Wrong Password!");
-    }
-};
+// USER PASSWORD UPDATE (ADMIN)
+function updateUserPassword() {
+    db.ref("userPassword").set(newUserPass.value);
+    alert("User password updated");
+}
 
-// Add File (Admin)
-document.getElementById("addFileBtn").onclick = () => {
-    const name = document.getElementById("fileName").value;
-    const url = document.getElementById("fileUrl").value;
+// ADD FILE
+function addFile() {
+    let title = fileTitle.value;
+    let link = fileLink.value;
 
-    if (!name || !url) return alert("Fill both fields!");
+    let key = db.ref("files").push().key;
 
-    db.ref("files").push({
-        name: name,
-        url: url
+    db.ref("files/" + key).set({
+        title: title,
+        link: link
     });
 
-    alert("File Added!");
-};
+    loadAdminFiles();
+}
 
-// Show files in Admin Panel
-db.ref("files").on("value", snap => {
-    document.getElementById("adminFileList").innerHTML = "";
-    snap.forEach(data => {
-        const file = data.val();
-        document.getElementById("adminFileList").innerHTML += `
-            <li>${file.name}</li>
-        `;
+// DELETE FILE
+function deleteFile(id) {
+    db.ref("files/" + id).remove();
+    loadAdminFiles();
+}
+
+// LOAD ADMIN FILES
+function loadAdminFiles() {
+    db.ref("files").on("value", snapshot => {
+        adminFiles.innerHTML = "";
+        snapshot.forEach(child => {
+            let data = child.val();
+            adminFiles.innerHTML += `
+                <div class="fileBox">
+                    <b>${data.title}</b>  
+                    <br>
+                    <button onclick="deleteFile('${child.key}')">Delete</button>
+                </div>
+            `;
+        });
     });
-});
+}
 
-// Show files in User Panel (NO URL shown)
-db.ref("files").on("value", snap => {
-    document.getElementById("userFileList").innerHTML = "";
-    snap.forEach(data => {
-        const file = data.val();
-        document.getElementById("userFileList").innerHTML += `
-            <li>${file.name}</li>
-        `;
+// LOAD USER FILES
+function loadUserFiles() {
+    db.ref("files").on("value", snapshot => {
+        userFiles.innerHTML = "";
+        snapshot.forEach(child => {
+            let data = child.val();
+            userFiles.innerHTML += `
+                <div class="fileBox">
+                    <b>${data.title}</b><br>
+                    <a href="${data.link}" target="_blank">Open</a>
+                </div>
+            `;
+        });
     });
-});
+}
 
-// Logout
-document.getElementById("logoutBtn").onclick = () => location.reload();
-document.getElementById("logoutBtn2").onclick = () => location.reload();
+// SEARCH
+function searchFiles() {
+    let text = searchBox.value.toLowerCase();
+    document.querySelectorAll("#userFiles .fileBox").forEach(box => {
+        box.style.display = 
+            box.innerText.toLowerCase().includes(text) ? "block" : "none";
+    });
+}
+
+// LOGOUT
+function logout() {
+    firebase.auth().signOut();
+    hideAll();
+    loginPage.style.display = "block";
+}
