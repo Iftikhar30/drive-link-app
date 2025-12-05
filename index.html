@@ -14,14 +14,23 @@
   <div class="container">
 
     <!-- HOME -->
-    <section id="homePage" class="">
-      <h1>SDFM — Secure Drive File Manager</h1>
-      <p class="muted">A private, password-protected file list backed by Firebase.</p>
-      <div class="buttons">
-        <button id="btnAdmin" class="btn" onclick="showAdminLogin()">Admin Login</button>
-        <button id="btnUser" class="btn ghost" onclick="showUserLogin()">User Login</button>
-      </div>
-    </section>
+    <section id="userLoginPage" class="card">
+  <h2>স্বাগতম আমার ভাবনাগুলোতে</h2>
+
+  <div class="form">
+    <input id="userPasswordInput" type="password" placeholder="পাসওয়ার্ড দিন..." />
+
+    <div class="buttons">
+      <button class="btn primary" onclick="userLogin()">Enter</button>
+    </div>
+
+    <div id="userLoginMsg" class="message"></div>
+
+    <p style="margin-top:12px; font-size:13px; text-align:right;">
+      <a href="#" onclick="showAdminLogin()">Admin Login</a>
+    </p>
+  </div>
+</section>
 
     <!-- ADMIN LOGIN -->
     <section id="adminLoginPage" class="hidden card">
@@ -115,3 +124,4 @@
   <script src="app.js"></script>
 </body>
 </html>
+
