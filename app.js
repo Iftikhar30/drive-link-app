@@ -1,162 +1,98 @@
-// app.js - modular script
-// NOTE: Fill firebaseConfig object with your Firebase project config (instructions below)
-
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
-import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js';
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, deleteDoc, updateDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js';
-
-// ----- Firebase config: replace with YOUR values -----
+// Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyCFQErfyzr2oiap8epvdkiImSoWCyLdjb0",
   authDomain: "my-family-pic.firebaseapp.com",
   databaseURL: "https://my-family-pic-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "my-family-pic",
-  storageBucket: "my-family-pic.firebasestorage.app",
+  storageBucket: "my-family-pic.appspot.com",
   messagingSenderId: "1016445913558",
   appId: "1:1016445913558:web:b4b8e620494e5cc4f23c77"
 };
 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// initialize
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// UI Elements
+const adminBtn = document.getElementById("adminBtn");
+const userBtn = document.getElementById("userBtn");
+const adminLogin = document.getElementById("adminLogin");
+const userLogin = document.getElementById("userLogin");
+const adminPanel = document.getElementById("adminPanel");
+const userPanel = document.getElementById("userPanel");
 
-// DOM elements
-const btnAdminLogin = document.getElementById('btn-admin-login');
-const btnUserLogin = document.getElementById('btn-user-login');
-const adminLoginCard = document.getElementById('admin-login');
-const userLoginCard = document.getElementById('user-login');
-const adminPanel = document.getElementById('admin-panel');
-const userPanel = document.getElementById('user-panel');
-const appArea = document.getElementById('app-area');
-const adminFilesDiv = document.getElementById('admin-files');
-const fileListDiv = document.getElementById('file-list');
-const searchInput = document.getElementById('search');
+// Login Buttons
+adminBtn.onclick = () => {
+    adminLogin.classList.remove("hidden");
+    userLogin.classList.add("hidden");
+};
 
-// login buttons
-btnAdminLogin.addEventListener('click', ()=>{adminLoginCard.classList.remove('hidden'); userLoginCard.classList.add('hidden'); appArea.classList.remove('hidden');});
-btnUserLogin.addEventListener('click', ()=>{userLoginCard.classList.remove('hidden'); adminLoginCard.classList.add('hidden'); appArea.classList.remove('hidden');});
+userBtn.onclick = () => {
+    userLogin.classList.remove("hidden");
+    adminLogin.classList.add("hidden");
+};
 
-// Admin Login flow (Firebase Auth email+password)
-document.getElementById('admin-login-btn').addEventListener('click', async ()=>{
-  const email = document.getElementById('admin-email').value.trim();
-  const pass = document.getElementById('admin-password').value;
-  if(!email||!pass){alert('Enter admin email & password');return}
-  try{
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    // success
-    showAdminPanel(cred.user.uid);
-  }catch(e){alert('Admin login error: '+e.message)}
-});
+// Admin Login
+document.getElementById("adminLoginBtn").onclick = () => {
+    const email = document.getElementById("adminEmail").value;
+    const pass = document.getElementById("adminPass").value;
 
-// Admin logout
-document.getElementById('admin-logout').addEventListener('click', async ()=>{
-  await signOut(auth);
-  adminPanel.classList.add('hidden');
-  appArea.classList.add('hidden');
-  alert('Admin logged out');
-});
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+        .then(() => {
+            adminPanel.classList.remove("hidden");
+            adminLogin.classList.add("hidden");
+        })
+        .catch(() => alert("Wrong Admin Login!"));
+};
 
-// Add file
-document.getElementById('add-file-btn').addEventListener('click', async ()=>{
-  const name = document.getElementById('add-name').value.trim();
-  const url = document.getElementById('add-url').value.trim();
-  if(!name||!url){alert('Name and URL required');return}
-  // Save to Firestore collection 'files'
-  try{
-    await addDoc(collection(db,'files'),{name, url, createdAt: Date.now()});
-    document.getElementById('add-name').value='';document.getElementById('add-url').value='';
-  }catch(e){alert('Error adding file: '+e.message)}
-});
+// User Login (Simple password)
+document.getElementById("userLoginBtn").onclick = () => {
+    const pass = document.getElementById("userPass").value;
 
-// Delete file (admin)
-async function deleteFile(id){ if(!confirm('Delete file?')) return; await deleteDoc(doc(db,'files',id)); }
-// Change user password (store SHA256 hash in document 'config/user')
-document.getElementById('change-user-pass-btn').addEventListener('click', async ()=>{
-  const newPass = document.getElementById('new-user-pass').value;
-  if(!newPass){alert('Enter new password');return}
-  const hash = await sha256(newPass);
-  await setDoc(doc(db,'config','user'), {passwordHash: hash});
-  alert('User password updated');
-  document.getElementById('new-user-pass').value='';
-});
+    if (pass === "1122") {
+        userPanel.classList.remove("hidden");
+        userLogin.classList.add("hidden");
+    } else {
+        alert("Wrong Password!");
+    }
+};
 
-// User login: fetch config/user and compare hashes
-document.getElementById('user-login-btn').addEventListener('click', async ()=>{
-  const pass = document.getElementById('user-password').value;
-  if(!pass){alert('Enter password');return}
-  const cfg = await getDoc(doc(db,'config','user'));
-  if(!cfg.exists()){alert('User password not set by admin yet');return}
-  const storedHash = cfg.data().passwordHash || '';
-  const inputHash = await sha256(pass);
-  if(inputHash === storedHash){
-    // show user panel
-    showUserPanel();
-  } else alert('Wrong password');
-});
+// Add File (Admin)
+document.getElementById("addFileBtn").onclick = () => {
+    const name = document.getElementById("fileName").value;
+    const url = document.getElementById("fileUrl").value;
 
-// Logout user
-document.getElementById('user-logout').addEventListener('click', ()=>{ userPanel.classList.add('hidden'); appArea.classList.add('hidden'); alert('User logged out'); });
+    if (!name || !url) return alert("Fill both fields!");
 
-// show admin panel: subscribe to files collection
-function showAdminPanel(adminUid){ adminLoginCard.classList.add('hidden'); adminPanel.classList.remove('hidden'); userPanel.classList.add('hidden');
-  // subscribe to files
-  onSnapshot(collection(db,'files'), (snap) =>{
-    adminFilesDiv.innerHTML='';
-    snap.forEach(docu =>{
-      const data = docu.data();
-      const div = document.createElement('div'); div.className='file-row';
-      div.innerHTML = <div class='meta'>${data.name}</div><div class='actions'><button onclick="window.open('${data.url}','_blank')">Open</button> <button class='btn-delete' onclick="deleteFile('${docu.id}')">Delete</button></div>;
-      adminFilesDiv.appendChild(div);
+    db.ref("files").push({
+        name: name,
+        url: url
     });
-  });
-}
 
-// show user panel: fetch files (live) and render names + Open button (link not shown)
-function showUserPanel(){ adminLoginCard.classList.add('hidden'); userLoginCard.classList.add('hidden'); adminPanel.classList.add('hidden'); userPanel.classList.remove('hidden');
-  appArea.classList.remove('hidden');
-  // subscribe
-  onSnapshot(collection(db,'files'), (snap) =>{
-    const files = [];
-    snap.forEach(d=> files.push({id:d.id, ...d.data()}));
-    renderFileList(files);
-  });
-}
+    alert("File Added!");
+};
 
-// render and search
-function renderFileList(files){
-  fileListDiv.innerHTML='';
-  const q = (searchInput.value||'').toLowerCase();
-  const filtered = files.filter(f=> f.name.toLowerCase().includes(q));
-  if(filtered.length===0) fileListDiv.innerHTML='<p>No files found</p>';
-  filtered.forEach(f=>{
-    const row = document.createElement('div'); row.className='file-row';
-    row.innerHTML = <div class='meta'>${f.name}</div><div class='actions'><button onclick="openFile('${f.url}')">Open</button></div>;
-    fileListDiv.appendChild(row);
-  });
-}
-
-searchInput.addEventListener('input', async ()=>{
-  // snapshot already re-renders; just trigger filtering by re-fetching all
-  const snap = await getDocs(collection(db,'files'));
-  const files = []; snap.forEach(d=>files.push({id:d.id, ...d.data()}));
-  renderFileList(files);
+// Show files in Admin Panel
+db.ref("files").on("value", snap => {
+    document.getElementById("adminFileList").innerHTML = "";
+    snap.forEach(data => {
+        const file = data.val();
+        document.getElementById("adminFileList").innerHTML += `
+            <li>${file.name}</li>
+        `;
+    });
 });
 
-// helper: open file (called from dynamic HTML)
-window.openFile = function(url){ window.open(url,'_blank'); }
-window.deleteFile = deleteFile;
+// Show files in User Panel (NO URL shown)
+db.ref("files").on("value", snap => {
+    document.getElementById("userFileList").innerHTML = "";
+    snap.forEach(data => {
+        const file = data.val();
+        document.getElementById("userFileList").innerHTML += `
+            <li>${file.name}</li>
+        `;
+    });
+});
 
-// helper: SHA-256 (returns hex)
-async function sha256(message){
-  const msgUint8 = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
-  return hashHex;
-}
-
-// Notes: This simple approach stores file URLs in Firestore and shows only name+button in user UI.
-// Admin must create initial admin user via Firebase Console > Authentication > Users (create user)
-
+// Logout
+document.getElementById("logoutBtn").onclick = () => location.reload();
+document.getElementById("logoutBtn2").onclick = () => location.reload();
