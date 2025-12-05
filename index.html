@@ -1,79 +1,117 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Drive Link App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="style.css">
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Secure Drive File Manager (SDFM)</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Firebase v8 CDN (non-modular) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
-
 <body>
+  <div class="container">
 
-<div class="container">
+    <!-- HOME -->
+    <section id="homePage" class="">
+      <h1>SDFM — Secure Drive File Manager</h1>
+      <p class="muted">A private, password-protected file list backed by Firebase.</p>
+      <div class="buttons">
+        <button id="btnAdmin" class="btn" onclick="showAdminLogin()">Admin Login</button>
+        <button id="btnUser" class="btn ghost" onclick="showUserLogin()">User Login</button>
+      </div>
+    </section>
 
-<h1>Drive Link App</h1>
+    <!-- ADMIN LOGIN -->
+    <section id="adminLoginPage" class="hidden card">
+      <h2>Admin Login</h2>
+      <div class="form">
+        <input id="adminEmail" type="email" placeholder="Email" />
+        <input id="adminPassword" type="password" placeholder="Password" />
+        <div class="buttons">
+          <button class="btn primary" onclick="adminLogin()">Login</button>
+          <button class="btn ghost" onclick="showHome()">Back</button>
+        </div>
+        <div id="adminLoginMsg" class="message"></div>
+      </div>
+    </section>
 
-<div id="home">
-<button id="adminBtn">Admin Login</button>
-<button id="userBtn">User Login</button>
-</div>
+    <!-- USER LOGIN -->
+    <section id="userLoginPage" class="hidden card">
+      <h2>User Login</h2>
+      <div class="form">
+        <input id="userPasswordInput" type="password" placeholder="Enter access password" />
+        <div class="buttons">
+          <button class="btn primary" onclick="userLogin()">Enter</button>
+          <button class="btn ghost" onclick="showHome()">Back</button>
+        </div>
+        <div id="userLoginMsg" class="message"></div>
+      </div>
+    </section>
 
-<!-- ADMIN LOGIN -->
-<div id="adminLogin" class="hidden">
-<input type="email" id="adminEmail" placeholder="Admin Email">
-<input type="password" id="adminPass" placeholder="Admin Password">
-<button id="adminLoginBtn">Login</button>
-<button onclick="back()">Back</button>
-</div>
+    <!-- ADMIN PANEL -->
+    <section id="adminPanel" class="hidden card">
+      <div class="panel-header">
+        <h2>Admin Panel</h2>
+        <div>
+          <button class="btn danger" onclick="logout()">Logout</button>
+        </div>
+      </div>
 
-<!-- USER LOGIN -->
-<div id="userLogin" class="hidden">
-<input type="password" id="userPass">
-<button id="userLoginBtn">Login</button>
-<button onclick="back()">Back</button>
-</div>
+      <div class="panel-grid">
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="hidden">
+        <!-- Manage user password -->
+        <div class="panel-section">
+          <h3>Manage User Password</h3>
+          <input id="newUserPassword" type="text" placeholder="New user password" />
+          <div class="buttons">
+            <button class="btn" onclick="updateUserPassword()">Update Password</button>
+          </div>
+          <div id="updatePasswordMsg" class="message"></div>
+        </div>
 
-<h2>Admin Panel</h2>
+        <!-- Add file -->
+        <div class="panel-section">
+          <h3>Add File</h3>
+          <input id="fileTitle" type="text" placeholder="File title" />
+          <input id="fileLink" type="text" placeholder="Google Drive shareable link (full URL)" />
+          <div class="buttons">
+            <button class="btn" onclick="addFile()">Add File</button>
+          </div>
+          <div id="addFileMsg" class="message"></div>
+        </div>
 
-<input type="text" id="newUserPass" placeholder="Set User Password">
-<button id="saveUserPass">Save Password</button>
+        <!-- File list -->
+        <div class="panel-section full">
+          <h3>Files</h3>
+          <ul id="adminFileList" class="file-list"></ul>
+        </div>
 
-<hr>
+      </div>
+    </section>
 
-<input type="text" id="fileTitle" placeholder="File Title">
-<input type="text" id="fileLink" placeholder="File Link">
-<button id="addFileBtn">Add File</button>
+    <!-- USER PANEL -->
+    <section id="userPanel" class="hidden card">
+      <div class="panel-header">
+        <h2>User Panel</h2>
+        <div>
+          <button class="btn danger" onclick="logout()">Logout</button>
+        </div>
+      </div>
 
-<h3>Files</h3>
-<div id="adminFiles"></div>
+      <div class="user-controls">
+        <input id="searchInput" type="text" placeholder="Search files by title..." oninput="searchFiles()" />
+      </div>
 
-<button onclick="logout()">Logout</button>
-</div>
+      <div>
+        <ul id="userFileList" class="file-list"></ul>
+      </div>
+    </section>
 
-<!-- USER PANEL -->
-<div id="userPanel" class="hidden">
+    <footer class="footer muted">Built for GitHub Pages + Firebase (v8). UI: pure HTML/CSS/JS.</footer>
+  </div>
 
-<h2>User Panel</h2>
-
-<input type="text" id="search" placeholder="Search...">
-<div id="userFiles"></div>
-
-<button onclick="logout()">Logout</button>
-</div>
-
-</div>
-
-<script src="app-v2.js"></script>
-
+  <script src="app.js"></script>
 </body>
 </html>
-
