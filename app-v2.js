@@ -138,3 +138,4 @@ function logout() {
     auth.signOut();
     location.reload();
 }
+
