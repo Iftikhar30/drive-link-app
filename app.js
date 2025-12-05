@@ -346,43 +346,26 @@ function renderUserList(filter){
    This addresses the "no raw links in HTML/attributes/source" requirement.
 */
 function openSecureLink(encodedLink){
-  try{
-    // Build small HTML that decodes and redirects immediately.
-    // We keep the blob content minimal and avoid putting the raw URL in the main page.
-    const blobHTML = `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta http-equiv="refresh" content="0;url=data:,">
-<title>Redirecting...</title>
-</head>
-<body>
-<script>
-(function(){
-  try{
-    var enc = "${encodedLink}";
-    // decode base64 safely
-    var decoded = decodeURIComponent(escape(atob(enc)));
-    // Use replace() so back button doesn't keep intermediary
-    window.location.replace(decoded);
-  }catch(e){
-    document.body.innerHTML = '<p style="font-family:system-ui,Arial">Redirect failed.</p>';
-    console.error(e);
-  }
-})();
-</script>
-</body>
-</html>
-`.trim();
+  try {
+    const decoded = decodeURIComponent(escape(atob(encodedLink)));
 
-    const blob = new Blob([blobHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    // Revoke the object URL after a short time to help garbage collection.
-    setTimeout(function(){ try{ URL.revokeObjectURL(url); }catch(e){} }, 20000);
-  }catch(e){
-    alert('Unable to open file.');
+    // Extract Google Drive File ID
+    const match = decoded.match(/\/d\/(.*?)\//);
+    if(!match){
+      alert("Invalid Google Drive link.");
+      return;
+    }
+    const fileId = match[1];
+
+    // Build preview link
+    const previewURL = "https://drive.google.com/file/d/" + fileId + "/preview";
+
+    // Show inside iframe
+    document.getElementById("filePreviewBox").classList.remove("hidden");
+    document.getElementById("filePreviewFrame").src = previewURL;
+
+  } catch (e) {
+    alert("Failed to load preview.");
   }
 }
 window.openSecureLink = openSecureLink;
@@ -407,3 +390,4 @@ auth.onAuthStateChanged(user=>{
 
 /* ---------- Initial load: just show home ---------- */
 showHome();
+
