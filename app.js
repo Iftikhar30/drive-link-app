@@ -389,5 +389,6 @@ auth.onAuthStateChanged(user=>{
 });
 
 /* ---------- Initial load: just show home ---------- */
-showHome();
+showUserLogin();
+
 
