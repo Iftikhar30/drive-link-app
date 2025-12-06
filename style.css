@@ -179,3 +179,39 @@ h3{margin:0 0 8px}
   font-size:13px;
   color:var(--muted)
 }
+/* ✅ Always fix logout button scrolling issue */
+.logout-btn {
+    width: 100%;
+    background: #ff4d4d;
+    color: white;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    margin-top: 25px;
+    cursor: pointer;
+
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+}
+
+/* ✅ Prevent body scroll freeze */
+html, body {
+    height: auto !important;
+    overflow-y: auto !important;
+}
+
+/* ✅ Ensure preview area doesn't break layout */
+.preview-box {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* ✅ If any wrapper using fixed height */
+.container,
+.main-wrapper,
+.content {
+    height: auto !important;
+    overflow: visible !important;
+}
