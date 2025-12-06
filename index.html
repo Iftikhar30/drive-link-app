@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Secure Drive File Manager (SDFM)</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Firebase v8 CDN (non-modular) -->
+
+  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -13,24 +14,24 @@
 <body>
   <div class="container">
 
-    <!-- HOME -->
+    <!-- FIXED: Only ONE user login section -->
     <section id="userLoginPage" class="card">
-  <h2>স্বাগতম আমার ভাবনাগুলোতে</h2>
+      <h2>স্বাগতম আমার ভাবনাগুলোতে</h2>
 
-  <div class="form">
-    <input id="userPasswordInput" type="password" placeholder="পাসওয়ার্ড দিন..." />
+      <div class="form">
+        <input id="userPasswordInput" type="password" placeholder="পাসওয়ার্ড দিন..." />
 
-    <div class="buttons">
-      <button class="btn primary" onclick="userLogin()">Enter</button>
-    </div>
+        <div class="buttons">
+          <button class="btn primary" onclick="userLogin()">Enter</button>
+        </div>
 
-    <div id="userLoginMsg" class="message"></div>
+        <div id="userLoginMsg" class="message"></div>
 
-    <p style="margin-top:12px; font-size:13px; text-align:right;">
-      <a href="#" onclick="showAdminLogin()">Admin Login</a>
-    </p>
-  </div>
-</section>
+        <p style="margin-top:12px; font-size:13px; text-align:right;">
+          <a href="#" onclick="showAdminLogin()">Admin Login</a>
+        </p>
+      </div>
+    </section>
 
     <!-- ADMIN LOGIN -->
     <section id="adminLoginPage" class="hidden card">
@@ -46,19 +47,6 @@
       </div>
     </section>
 
-    <!-- USER LOGIN -->
-    <section id="userLoginPage" class="hidden card">
-      <h2>User Login</h2>
-      <div class="form">
-        <input id="userPasswordInput" type="password" placeholder="Enter access password" />
-        <div class="buttons">
-          <button class="btn primary" onclick="userLogin()">Enter</button>
-          <button class="btn ghost" onclick="showHome()">Back</button>
-        </div>
-        <div id="userLoginMsg" class="message"></div>
-      </div>
-    </section>
-
     <!-- ADMIN PANEL -->
     <section id="adminPanel" class="hidden card">
       <div class="panel-header">
@@ -69,8 +57,6 @@
       </div>
 
       <div class="panel-grid">
-
-        <!-- Manage user password -->
         <div class="panel-section">
           <h3>Manage User Password</h3>
           <input id="newUserPassword" type="text" placeholder="New user password" />
@@ -80,23 +66,20 @@
           <div id="updatePasswordMsg" class="message"></div>
         </div>
 
-        <!-- Add file -->
         <div class="panel-section">
           <h3>Add File</h3>
           <input id="fileTitle" type="text" placeholder="File title" />
-          <input id="fileLink" type="text" placeholder="Google Drive shareable link (full URL)" />
+          <input id="fileLink" type="text" placeholder="Google Drive shareable link" />
           <div class="buttons">
             <button class="btn" onclick="addFile()">Add File</button>
           </div>
           <div id="addFileMsg" class="message"></div>
         </div>
 
-        <!-- File list -->
         <div class="panel-section full">
           <h3>Files</h3>
           <ul id="adminFileList" class="file-list"></ul>
         </div>
-
       </div>
     </section>
 
@@ -110,32 +93,26 @@
       </div>
 
       <div class="user-controls">
-        <input id="searchInput" type="text" placeholder="Search files by title..." oninput="searchFiles()" />
+        <input id="searchInput" type="text" placeholder="Search files..." oninput="searchFiles()" />
       </div>
 
-      <div>
-        <ul id="userFileList" class="file-list"></ul>
-      </div>
+      <ul id="userFileList" class="file-list"></ul>
+
       <div id="filePreviewBox" class="hidden" style="margin-top:20px;">
-  <h3>Preview</h3>
-  <iframe id="filePreviewFrame"
-          style="width:100%; height:500px; border:1px solid #ccc; border-radius:8px;">
-  </iframe>
+        <h3>Preview</h3>
+        <iframe id="filePreviewFrame"
+                style="width:100%; height:500px; border:1px solid #ccc; border-radius:8px;">
+        </iframe>
       </div>
-      
     </section>
 
     <footer class="footer muted">
-  <a href="https://wa.me/8801540162736" target="_blank" style="text-decoration:none; color:inherit;">
-    Developer By Iftikhar
-  </a>
+      <a href="https://wa.me/8801540162736" target="_blank" style="text-decoration:none; color:inherit;">
+        Developer By Iftikhar
+      </a>
     </footer>
   </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-
-
-
-
