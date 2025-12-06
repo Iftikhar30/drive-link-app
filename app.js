@@ -15,6 +15,7 @@ function getThumbnailUrl(url) {
     return `https://drive.google.com/thumbnail?id=${id}`;
 }
 
+// Firebase
 var firebaseConfig = {
     apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
     authDomain: "family-photo-b81a9.firebaseapp.com",
@@ -146,22 +147,9 @@ function loadFilesForAdmin() {
     });
 }
 
-// Extract Google Drive File ID
-function extractDriveFileId(url) {
-    const match = url.match(/\/d\/(.+?)\//);
-    return match ? match[1] : null;
-}
-
-// Generate Google Drive Thumbnail (PUBLIC preview)
-function getThumbnailUrl(url) {
-    const id = extractDriveFileId(url);
-    if (!id) return "https://via.placeholder.com/80";
-    return https://drive.google.com/thumbnail?id=${id};
-}
-
-// ----------------------------
+// ---------------------------
 // Load Files User (WITH THUMBNAIL)
-// ----------------------------
+// ---------------------------
 function loadFilesForUser() {
     db.ref("files").on("value", snap => {
         let box = document.getElementById("userFileList");
@@ -172,15 +160,16 @@ function loadFilesForUser() {
             let fileUrl = atob(data.link);
             let thumb = getThumbnailUrl(fileUrl);
 
-            box.innerHTML += 
+            box.innerHTML += `
                 <li onclick="openSecureLink('${data.link}')" class="file-item">
-                    <img src="${thumb}" class="thumb" style="width:50px; height:50px; object-fit:cover; border-radius:6px; margin-right:10px;">
+                    <img src="${thumb}" class="thumb">
                     <span class="title">${data.title}</span>
                 </li>
-            ;
+            `;
         });
     });
 }
+
 // ---------------------------
 // Search Files
 // ---------------------------
@@ -228,7 +217,7 @@ function showMessage(id, msg) {
     }, 2000);
 }
 
-// Export
+// Export to Window
 window.showAdminLogin = showAdminLogin;
 window.adminLogin = adminLogin;
 window.userLogin = userLogin;
@@ -239,4 +228,3 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
-
