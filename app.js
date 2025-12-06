@@ -10,19 +10,18 @@ function extractDriveFileId(url) {
 // Get Thumbnail URL
 // ---------------------------
 function getThumbnailUrl(url) {
-    // Drive folder link detect
+
+    // If folder link → show folder icon
     if (url.includes("drive.google.com/drive/folders")) {
-        return "https://cdn-icons-png.flaticon.com/512/716/716784.png"; // folder icon
+        return "https://cdn-icons-png.flaticon.com/512/716/716784.png";
     }
 
-    // Extract file ID normally
     const id = extractDriveFileId(url);
     if (!id) return "https://via.placeholder.com/80";
 
-    return https://drive.google.com/thumbnail?id=${id};
+    return `https://drive.google.com/thumbnail?id=${id}`;
 }
 
-// Firebase
 var firebaseConfig = {
     apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
     authDomain: "family-photo-b81a9.firebaseapp.com",
@@ -37,15 +36,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ---------------------------
-// Hide All Pages
-// ---------------------------
 function hideAll() {
     document.querySelectorAll("section").forEach(x => x.classList.add("hidden"));
 }
 
-// ---------------------------
-// Show Pages
-// ---------------------------
 function showHome() {
     hideAll();
     document.getElementById("userLoginPage").classList.remove("hidden");
@@ -57,8 +51,6 @@ function showAdminLogin() {
 }
 
 // ---------------------------
-// Admin Login
-// ---------------------------
 function adminLogin() {
     let email = document.getElementById("adminEmail").value;
     let pass = document.getElementById("adminPassword").value;
@@ -69,13 +61,9 @@ function adminLogin() {
             hideAll();
             document.getElementById("adminPanel").classList.remove("hidden");
         })
-        .catch(err => {
-            showMessage("adminLoginMsg", err.message);
-        });
+        .catch(err => showMessage("adminLoginMsg", err.message));
 }
 
-// ---------------------------
-// User Login
 // ---------------------------
 function userLogin() {
     let input = document.getElementById("userPasswordInput").value;
@@ -92,8 +80,6 @@ function userLogin() {
 }
 
 // ---------------------------
-// Update User Password
-// ---------------------------
 function updateUserPassword() {
     let newPass = document.getElementById("newUserPassword").value;
 
@@ -101,8 +87,6 @@ function updateUserPassword() {
     showMessage("updatePasswordMsg", "User Password Updated!");
 }
 
-// ---------------------------
-// Add File
 // ---------------------------
 function addFile() {
     let title = document.getElementById("fileTitle").value;
@@ -123,15 +107,11 @@ function addFile() {
 }
 
 // ---------------------------
-// Delete File
-// ---------------------------
 function deleteFile(id) {
     db.ref("files/" + id).remove();
     loadFilesForAdmin();
 }
 
-// ---------------------------
-// Load Files Admin
 // ---------------------------
 function loadFilesForAdmin() {
     db.ref("files").on("value", snap => {
@@ -155,7 +135,7 @@ function loadFilesForAdmin() {
 }
 
 // ---------------------------
-// Load Files User (WITH THUMBNAIL)
+// Load Files User (With Thumbnail)
 // ---------------------------
 function loadFilesForUser() {
     db.ref("files").on("value", snap => {
@@ -178,8 +158,6 @@ function loadFilesForUser() {
 }
 
 // ---------------------------
-// Search Files
-// ---------------------------
 function searchFiles() {
     let input = document.getElementById("searchInput").value.toLowerCase();
 
@@ -188,8 +166,6 @@ function searchFiles() {
     });
 }
 
-// ---------------------------
-// Secure Link Open (Preview)
 // ---------------------------
 function openSecureLink(encoded) {
     let url = atob(encoded);
@@ -202,15 +178,11 @@ function openSecureLink(encoded) {
 }
 
 // ---------------------------
-// Logout
-// ---------------------------
 function logout() {
     firebase.auth().signOut();
     showHome();
 }
 
-// ---------------------------
-// Message
 // ---------------------------
 function showMessage(id, msg) {
     let box = document.getElementById(id);
@@ -224,7 +196,7 @@ function showMessage(id, msg) {
     }, 2000);
 }
 
-// Export to Window
+// EXPORT
 window.showAdminLogin = showAdminLogin;
 window.adminLogin = adminLogin;
 window.userLogin = userLogin;
@@ -235,4 +207,3 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
-
