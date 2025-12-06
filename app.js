@@ -1,9 +1,7 @@
-// ---------------------------
-// Firebase Init (v8)
-// ---------------------------
 var firebaseConfig = {
     apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
     authDomain: "family-photo-b81a9.firebaseapp.com",
+    databaseURL: "https://family-photo-b81a9-default-rtdb.firebaseio.com",
     projectId: "family-photo-b81a9",
     storageBucket: "family-photo-b81a9.firebasestorage.app",
     messagingSenderId: "638306894478",
@@ -14,33 +12,31 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ---------------------------
-// Page Navigation
+// Hide All Pages
+// ---------------------------
+function hideAll() {
+    document.querySelectorAll("section").forEach(x => x.classList.add("hidden"));
+}
+
+// ---------------------------
+// Show Pages
 // ---------------------------
 function showHome() {
     hideAll();
-    document.getElementById("homePage").classList.remove("hidden");
+    document.getElementById("userLoginPage").classList.remove("hidden");
 }
 
 function showAdminLogin() {
     hideAll();
-    document.getElementById("adminLogin").classList.remove("hidden");
-}
-
-function showUserLogin() {
-    hideAll();
-    document.getElementById("userLogin").classList.remove("hidden");
-}
-
-function hideAll() {
-    document.querySelectorAll(".page").forEach(x => x.classList.add("hidden"));
+    document.getElementById("adminLoginPage").classList.remove("hidden");
 }
 
 // ---------------------------
-// Admin Login (Firebase Auth)
+// Admin Login
 // ---------------------------
 function adminLogin() {
     let email = document.getElementById("adminEmail").value;
-    let pass = document.getElementById("adminPass").value;
+    let pass = document.getElementById("adminPassword").value;
 
     firebase.auth().signInWithEmailAndPassword(email, pass)
         .then(() => {
@@ -49,15 +45,15 @@ function adminLogin() {
             document.getElementById("adminPanel").classList.remove("hidden");
         })
         .catch(err => {
-            showMessage("adminMsg", err.message);
+            showMessage("adminLoginMsg", err.message);
         });
 }
 
 // ---------------------------
-// User Login (Password Only)
+// User Login
 // ---------------------------
 function userLogin() {
-    let input = document.getElementById("userPass").value;
+    let input = document.getElementById("userPasswordInput").value;
 
     db.ref("settings/userPassword").once("value", snap => {
         if (snap.val() === input) {
@@ -65,7 +61,7 @@ function userLogin() {
             hideAll();
             document.getElementById("userPanel").classList.remove("hidden");
         } else {
-            showMessage("userMsg", "ভুল পাসওয়ার্ড!");
+            showMessage("userLoginMsg", "ভুল পাসওয়ার্ড!");
         }
     });
 }
@@ -77,7 +73,7 @@ function updateUserPassword() {
     let newPass = document.getElementById("newUserPassword").value;
 
     db.ref("settings/userPassword").set(newPass);
-    showMessage("adminMsg", "User Password Updated!");
+    showMessage("updatePasswordMsg", "User Password Updated!");
 }
 
 // ---------------------------
@@ -97,7 +93,7 @@ function addFile() {
     document.getElementById("fileTitle").value = "";
     document.getElementById("fileLink").value = "";
 
-    showMessage("adminMsg", "File Added!");
+    showMessage("addFileMsg", "File Added!");
     loadFilesForAdmin();
 }
 
@@ -110,7 +106,7 @@ function deleteFile(id) {
 }
 
 // ---------------------------
-// Load Files - Admin
+// Load Files Admin
 // ---------------------------
 function loadFilesForAdmin() {
     db.ref("files").on("value", snap => {
@@ -119,19 +115,22 @@ function loadFilesForAdmin() {
 
         snap.forEach(child => {
             let data = child.val();
+
             box.innerHTML += `
-                <div class="fileBox">
-                    <b>${data.title}</b>
-                    <button onclick="openSecureLink('${data.link}')">Open</button>
-                    <button onclick="deleteFile('${child.key}')" class="danger">Delete</button>
-                </div>
+                <li>
+                    <span class="title">${data.title}</span>
+                    <div class="actions">
+                      <button onclick="openSecureLink('${data.link}')">Open</button>
+                      <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
+                    </div>
+                </li>
             `;
         });
     });
 }
 
 // ---------------------------
-// Load Files - User
+// Load Files User
 // ---------------------------
 function loadFilesForUser() {
     db.ref("files").on("value", snap => {
@@ -140,32 +139,38 @@ function loadFilesForUser() {
 
         snap.forEach(child => {
             let data = child.val();
+
             box.innerHTML += `
-                <div class="fileBox" onclick="openSecureLink('${data.link}')">
-                    ${data.title}
-                </div>
+                <li onclick="openSecureLink('${data.link}')">
+                    <span class="title">${data.title}</span>
+                </li>
             `;
         });
     });
 }
 
 // ---------------------------
-// Search Files (User)
+// Search Files
 // ---------------------------
 function searchFiles() {
     let input = document.getElementById("searchInput").value.toLowerCase();
 
-    document.querySelectorAll("#userFileList .fileBox").forEach(box => {
-        box.style.display = box.innerText.toLowerCase().includes(input) ? "block" : "none";
+    document.querySelectorAll("#userFileList li").forEach(item => {
+        item.style.display = item.innerText.toLowerCase().includes(input) ? "flex" : "none";
     });
 }
 
 // ---------------------------
-// Secure Link Open
+// Secure Link Open (Preview)
 // ---------------------------
 function openSecureLink(encoded) {
     let url = atob(encoded);
-    window.open(url, "_blank");
+
+    let box = document.getElementById("filePreviewBox");
+    let frame = document.getElementById("filePreviewFrame");
+
+    frame.src = url;
+    box.classList.remove("hidden");
 }
 
 // ---------------------------
@@ -177,30 +182,28 @@ function logout() {
 }
 
 // ---------------------------
-// Helper Message
+// Message
 // ---------------------------
 function showMessage(id, msg) {
     let box = document.getElementById(id);
     box.innerText = msg;
-    box.classList.add("show");
+
+    box.classList.add("success");
 
     setTimeout(() => {
-        box.classList.remove("show");
-    }, 2500);
+        box.innerText = "";
+        box.classList.remove("success");
+    }, 2000);
 }
 
-// ---------------------------
-// EXPORT FUNCTIONS (VERY IMPORTANT)
-// ---------------------------
+// Export
 window.showAdminLogin = showAdminLogin;
-window.showUserLogin = showUserLogin;
 window.adminLogin = adminLogin;
 window.userLogin = userLogin;
 window.updateUserPassword = updateUserPassword;
 window.addFile = addFile;
 window.deleteFile = deleteFile;
+window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
-window.openSecureLink = openSecureLink;
 window.showHome = showHome;
-
