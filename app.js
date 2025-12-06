@@ -2,8 +2,24 @@
 // Extract Drive File ID
 // ---------------------------
 function extractDriveFileId(url) {
-    const match = url.match(/\/d\/(.+?)\//);
-    return match ? match[1] : null;
+
+    // 1) embeddedfolderview?id=xxxx
+    let match0 = url.match(/embeddedfolderview\?id=([a-zA-Z0-9_-]+)/);
+    if (match0) return match0[1];
+
+    // 2) /file/d/xxxx/
+    let match1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (match1) return match1[1];
+
+    // 3) open?id=xxxx
+    let match2 = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
+    if (match2) return match2[1];
+
+    // 4) uc?id=xxxx
+    let match3 = url.match(/uc\?id=([a-zA-Z0-9_-]+)/);
+    if (match3) return match3[1];
+
+    return null;
 }
 
 // ---------------------------
@@ -205,5 +221,6 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
