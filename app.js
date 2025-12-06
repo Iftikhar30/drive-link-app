@@ -2,13 +2,12 @@
 // Firebase Init (v8)
 // ---------------------------
 var firebaseConfig = {
-    apiKey: "YOUR_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    databaseURL: "YOUR_DB",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_BUCKET",
-    messagingSenderId: "YOUR_MSG_ID",
-    appId: "YOUR_APPID"
+    apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
+    authDomain: "family-photo-b81a9.firebaseapp.com",
+    projectId: "family-photo-b81a9",
+    storageBucket: "family-photo-b81a9.firebasestorage.app",
+    messagingSenderId: "638306894478",
+    appId: "1:638306894478:web:63e2a8600e5ffdb396ffdf"
 };
 firebase.initializeApp(firebaseConfig);
 
@@ -204,3 +203,4 @@ window.searchFiles = searchFiles;
 window.logout = logout;
 window.openSecureLink = openSecureLink;
 window.showHome = showHome;
+
