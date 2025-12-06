@@ -1,168 +1,281 @@
-/* ------------------------------
-   Firebase Configuration
------------------------------- */
-const firebaseConfig = {
-    apiKey: "YOUR-KEY",
-    authDomain: "YOUR-PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR-PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR-PROJECT",
-    storageBucket: "YOUR-PROJECT.appspot.com",
-    messagingSenderId: "00000000000",
-    appId: "YOUR-ID"
+/* app.js  
+   Secure Drive File Manager (SDFM)  
+   - Uses Firebase v8 (CDN scripts loaded in index.html)  
+*/
+
+/* --------- Firebase config (Your config) --------- */
+var firebaseConfig = {
+  apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
+  authDomain: "family-photo-b81a9.firebaseapp.com",
+  projectId: "family-photo-b81a9",
+  storageBucket: "family-photo-b81a9.firebasestorage.app",
+  messagingSenderId: "638306894478",
+  appId: "1:638306894478:web:63e2a8600e5ffdb396ffdf"
 };
+
 firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.database();
 
+/* ---------------- Global State ---------------- */
 let currentPage = "home";
+let filesData = {};
+let currentUser = null;
 
-/* ------------------------------
-   Universal Google Drive ID Extractor
------------------------------- */
-function extractDriveId(url) {
+/* ------------- Page Selectors ------------- */
+const homePage = document.getElementById("homePage");
+const adminLoginPage = document.getElementById("adminLoginPage");
+const userLoginPage = document.getElementById("userLoginPage");
+const adminPanel = document.getElementById("adminPanel");
+const userPanel = document.getElementById("userPanel");
 
-    // Pattern 1
-    let match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (match) return match[1];
+const adminLoginMsg = document.getElementById("adminLoginMsg");
+const userLoginMsg = document.getElementById("userLoginMsg");
+const updatePasswordMsg = document.getElementById("updatePasswordMsg");
+const addFileMsg = document.getElementById("addFileMsg");
 
-    // Pattern 2
-    match = url.match(/id=([a-zA-Z0-9_-]+)/);
-    if (match) return match[1];
+const adminFileList = document.getElementById("adminFileList");
+const userFileList = document.getElementById("userFileList");
+const searchInput = document.getElementById("searchInput");
 
-    // Pattern 3
-    match = url.match(/uc\?export=download&id=([a-zA-Z0-9_-]+)/);
-    if (match) return match[1];
-
-    // Pattern 4
-    match = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
-    if (match) return match[1];
-
-    return null;
+/* ------------ Navigation Helper ------------ */
+function showSection(section) {
+  [homePage, adminLoginPage, userLoginPage, adminPanel, userPanel].forEach(s => {
+    if (!s) return;
+    s.classList.add("hidden");
+  });
+  section.classList.remove("hidden");
+  window.scrollTo(0, 0);
 }
 
-/* ------------------------------
-   Secure File Open (Embed Preview)
------------------------------- */
-function openSecureLink(encodedLink) {
-    try {
-        const decoded = decodeURIComponent(escape(atob(encodedLink)));
+function showHome() { showSection(homePage); currentPage = "home"; }
+function showAdminLogin() { showSection(adminLoginPage); currentPage = "adminLogin"; }
+function showUserLogin() { showSection(userLoginPage); currentPage = "userLogin"; }
 
-        const fileId = extractDriveId(decoded);
-        if (!fileId) {
-            alert("Invalid Google Drive Link!");
-            return;
-        }
+window.showAdminLogin = showAdminLogin;
+window.showUserLogin = showUserLogin;
+window.showHome = showHome;
 
-        const embedURL = `https://drive.google.com/uc?export=preview&id=${fileId}`;
+/* =======================================================
+   1️⃣ ADMIN LOGIN
+======================================================= */
+function adminLogin() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
 
-        document.getElementById("filePreviewBox").classList.remove("hidden");
-        document.getElementById("filePreviewFrame").src = embedURL;
+  adminLoginMsg.textContent = "";
+  adminLoginMsg.className = "message";
 
-    } catch (err) {
-        alert("Failed to load preview.");
+  if (!email || !password) {
+    adminLoginMsg.textContent = "Enter email and password.";
+    adminLoginMsg.classList.add("error");
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCred => {
+      currentUser = userCred.user;
+      loadFilesForAdmin();
+      showSection(adminPanel);
+    })
+    .catch(err => {
+      adminLoginMsg.textContent = err.message;
+      adminLoginMsg.classList.add("error");
+    });
+}
+window.adminLogin = adminLogin;
+
+/* =======================================================
+   🔥 FIXED UNIVERSAL GOOGLE DRIVE ID EXTRACTOR
+======================================================= */
+function extractDriveId(url) {
+  // Pattern 1: /file/d/FILEID/
+  let m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+
+  // Pattern 2: id=FILEID
+  m = url.match(/id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+
+  // Pattern 3: uc?export=download&id=FILEID
+  m = url.match(/id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+
+  return null;
+}
+
+/* =======================================================
+   2️⃣ USER LOGIN (Password Only)
+======================================================= */
+function userLogin() {
+  const val = document.getElementById("userPasswordInput").value;
+
+  userLoginMsg.textContent = "";
+  userLoginMsg.className = "message";
+
+  if (!val) {
+    userLoginMsg.textContent = "Enter password.";
+    userLoginMsg.classList.add("error");
+    return;
+  }
+
+  db.ref("settings/userPassword").once("value").then(snap => {
+    const stored = snap.val();
+
+    if (val === stored) {
+      loadFilesForUser();
+      showSection(userPanel);
+      currentPage = "userPanel";
+    } else {
+      userLoginMsg.textContent = "Incorrect password.";
+      userLoginMsg.classList.add("error");
     }
+  });
+}
+window.userLogin = userLogin;
+
+/* =======================================================
+   3️⃣ ADMIN: Update User Password
+======================================================= */
+function updateUserPassword() {
+  const newPass = document.getElementById("newUserPassword").value;
+
+  updatePasswordMsg.textContent = "";
+  updatePasswordMsg.className = "message";
+
+  if (!auth.currentUser) {
+    updatePasswordMsg.textContent = "Admin not authenticated.";
+    updatePasswordMsg.classList.add("error");
+    return;
+  }
+
+  db.ref("settings/userPassword").set(newPass)
+    .then(() => {
+      updatePasswordMsg.textContent = "Password updated.";
+      updatePasswordMsg.classList.add("success");
+    });
+}
+window.updateUserPassword = updateUserPassword;
+
+/* =======================================================
+   4️⃣ ADD FILE (BASE64 ENCODED)
+======================================================= */
+function addFile() {
+  const title = document.getElementById("fileTitle").value;
+  const link = document.getElementById("fileLink").value;
+
+  if (!auth.currentUser) {
+    addFileMsg.textContent = "Admin not authenticated.";
+    addFileMsg.classList.add("error");
+    return;
+  }
+
+  const encoded = btoa(unescape(encodeURIComponent(link)));
+
+  db.ref("files").push({
+    title: title,
+    link: encoded
+  }).then(() => {
+    addFileMsg.textContent = "File added.";
+    addFileMsg.classList.add("success");
+  });
+}
+window.addFile = addFile;
+
+/* =======================================================
+   5️⃣ DELETE FILE
+======================================================= */
+function deleteFile(id) {
+  if (!auth.currentUser) return alert("Admin not authenticated");
+  db.ref("files/" + id).remove();
+}
+window.deleteFile = deleteFile;
+
+/* =======================================================
+   6️⃣ LOGOUT (🔥 FIXED — Always back to Home)
+======================================================= */
+function logout() {
+  firebase.auth().signOut().finally(() => {
+    showHome();
+  });
+
+  // User logout
+  showHome();
+}
+window.logout = logout;
+
+/* =======================================================
+   7️⃣ LOAD FILES FOR ADMIN
+======================================================= */
+function loadFilesForAdmin() {
+  db.ref("files").on("value", snap => {
+    const val = snap.val() || {};
+    adminFileList.innerHTML = "";
+
+    Object.keys(val).forEach(id => {
+      const item = val[id];
+      const decoded = decodeURIComponent(escape(atob(item.link)));
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <span>${item.title}</span>
+        <button onclick="window.open('${decoded}', '_blank')">Open</button>
+        <button class="danger" onclick="deleteFile('${id}')">Delete</button>
+      `;
+      adminFileList.appendChild(li);
+    });
+  });
+}
+window.loadFilesForAdmin = loadFilesForAdmin;
+
+/* =======================================================
+   8️⃣ LOAD FILES FOR USER (Secure Preview)
+======================================================= */
+function loadFilesForUser() {
+  db.ref("files").on("value", snap => {
+    const val = snap.val() || {};
+    filesData = val;
+    renderUserList();
+  });
+}
+window.loadFilesForUser = loadFilesForUser;
+
+/* =======================================================
+   🔥 9️⃣ SECURE PREVIEW INSIDE WEBSITE (No redirect)
+======================================================= */
+function openSecureLink(encodedLink) {
+  const decoded = decodeURIComponent(escape(atob(encodedLink)));
+  const fileId = extractDriveId(decoded);
+
+  if (!fileId) return alert("Invalid Google Drive link.");
+
+  const previewURL = `https://drive.google.com/file/d/${fileId}/preview`;
+
+  document.getElementById("filePreviewBox").classList.remove("hidden");
+  document.getElementById("filePreviewFrame").src = previewURL;
 }
 window.openSecureLink = openSecureLink;
 
-/* ------------------------------
-   Default Login Prompt
------------------------------- */
-window.onload = function () {
+/* =======================================================
+   🔟 RENDER USER LIST
+======================================================= */
+function renderUserList(filter = "") {
+  filter = filter.toLowerCase();
+  userFileList.innerHTML = "";
 
-    document.getElementById("homeTitle").innerText = "স্বাগতম আমার ভাবনাগুলোতে";
+  Object.keys(filesData).forEach(id => {
+    const file = filesData[id];
+    if (!file.title.toLowerCase().includes(filter)) return;
 
-    // Show password prompt automatically
-    document.getElementById("homePage").classList.add("hidden");
-    document.getElementById("userLoginPage").classList.remove("hidden");
-
-    // Footer update
-    document.getElementById("footerDev").innerHTML =
-        `<a href="https://wa.me/8801XXXXXXXXX" target="_blank">Developer By Iftikhar</a>`;
-};
-
-/* ------------------------------
-   User Login (Simple Password)
------------------------------- */
-document.getElementById("userLoginBtn").onclick = () => {
-    const pass = document.getElementById("userPassword").value;
-
-    if (pass === "") return alert("Please enter password");
-
-    // Your password here
-    if (pass === "12345") {
-
-        document.getElementById("userLoginPage").classList.add("hidden");
-        document.getElementById("fileListPage").classList.remove("hidden");
-
-    } else {
-        alert("Wrong password!");
-    }
-};
-
-/* ------------------------------
-   Admin Login Page (small text under login)
------------------------------- */
-document.getElementById("adminLoginSmall").onclick = () => {
-    document.getElementById("userLoginPage").classList.add("hidden");
-    document.getElementById("adminLoginPage").classList.remove("hidden");
-};
-
-/* ------------------------------
-   Admin Login (Firebase Auth)
------------------------------- */
-document.getElementById("adminLoginBtn").onclick = () => {
-
-    const email = document.getElementById("adminEmail").value;
-    const password = document.getElementById("adminPassword").value;
-
-    firebase.auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-            document.getElementById("adminLoginPage").classList.add("hidden");
-            document.getElementById("adminPanelPage").classList.remove("hidden");
-        })
-        .catch(err => alert(err.message));
-};
-
-/* ------------------------------
-   Load File List (Realtime DB)
------------------------------- */
-function loadFileList() {
-    const fileList = document.getElementById("fileList");
-    fileList.innerHTML = "";
-
-    firebase.database().ref("/files").on("value", snapshot => {
-        fileList.innerHTML = "";
-
-        snapshot.forEach(child => {
-            const data = child.val();
-
-            let div = document.createElement("div");
-            div.className = "fileItem";
-            div.innerHTML = `
-                <p>${data.name}</p>
-                <button onclick="openSecureLink('${data.secure}')">Open</button>
-            `;
-
-            fileList.appendChild(div);
-        });
-    });
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="title">${file.title}</span>`;
+    li.onclick = () => openSecureLink(file.link);
+    userFileList.appendChild(li);
+  });
 }
-loadFileList();
+window.searchFiles = renderUserList;
 
-/* ------------------------------
-   Logout (Always Return to Home)
------------------------------- */
-function logout() {
-
-    firebase.auth().signOut().finally(() => {
-
-        document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-
-        document.getElementById("homePage").classList.remove("hidden");
-        currentPage = "home";
-    });
-
-    document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-    document.getElementById("homePage").classList.remove("hidden");
-    currentPage = "home";
-}
-window.logout = logout;
+/* =======================================================
+   Auto-start on User Login Page (Your request)
+======================================================= */
+showUserLogin();
