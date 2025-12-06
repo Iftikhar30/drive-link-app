@@ -10,9 +10,16 @@ function extractDriveFileId(url) {
 // Get Thumbnail URL
 // ---------------------------
 function getThumbnailUrl(url) {
+    // Drive folder link detect
+    if (url.includes("drive.google.com/drive/folders")) {
+        return "https://cdn-icons-png.flaticon.com/512/716/716784.png"; // folder icon
+    }
+
+    // Extract file ID normally
     const id = extractDriveFileId(url);
     if (!id) return "https://via.placeholder.com/80";
-    return `https://drive.google.com/thumbnail?id=${id}`;
+
+    return https://drive.google.com/thumbnail?id=${id};
 }
 
 // Firebase
@@ -228,3 +235,4 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
