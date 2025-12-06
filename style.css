@@ -6,11 +6,11 @@
   --muted:#6b7280;
   --danger:#e02424;
   --success:#16a34a;
-  --glass: rgba(255,255,255,0.7);
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
+
 body{
   margin:0;
   font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -27,7 +27,7 @@ body{
   max-width:900px;
 }
 
-/* Cards / sections */
+/* General */
 .card{
   background:var(--card);
   border-radius:12px;
@@ -39,7 +39,7 @@ body{
 .hidden{display:none}
 
 /* Home */
-#homePage{
+#userLoginPage{
   text-align:center;
   padding:40px;
   background: linear-gradient(180deg, rgba(43,110,246,0.06), rgba(31,75,216,0.03));
@@ -60,86 +60,99 @@ h3{margin:0 0 8px}
   border-radius:8px;
   cursor:pointer;
   margin-right:8px;
-  transition:transform .08s ease, box-shadow .08s ease;
+  transition:0.08s ease;
   box-shadow: 0 2px 6px rgba(14,22,60,0.04);
 }
 .btn:hover{transform:translateY(-2px)}
-.btn:active{transform:translateY(0)}
-.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:0}
-.btn.ghost{background:transparent; color:var(--accent-2); border:1px dashed rgba(31,75,216,0.12)}
-.btn.danger{background:linear-gradient(90deg,var(--danger),#a61b1b); color:white;border:0}
+.btn.primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:white; border:0
+}
+.btn.ghost{
+  background:transparent;
+  color:var(--accent-2);
+  border:1px dashed rgba(31,75,216,0.12)
+}
+.btn.danger{
+  background:linear-gradient(90deg,var(--danger),#a61b1b);
+  color:white;
+  border:0
+}
 
-/* Form */
-.form input, .user-controls input, .panel-section input{
+/* Inputs */
+.form input,
+.user-controls input,
+.panel-section input{
   width:100%;
   padding:10px 12px;
   margin-bottom:10px;
   border-radius:8px;
   border:1px solid #e6eef8;
-  background: #fbfdff;
+  background:#fbfdff;
   outline:none;
   font-size:15px;
 }
-.file-item {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    margin-bottom: 12px;   /* gap between items */
-    border-radius: 10px;
+
+/* File List (PERFECT FIXED VERSION) */
+.file-list{
+  list-style:none;
+  padding:0;
+  margin:0;
 }
 
-.file-item img {
-    width: 60px;
-    height: 60px;
-    margin-right: 18px;   /* gap between icon & text */
-    object-fit: cover;
-    border-radius: 8px;
+.file-list li{
+  padding:0;
+  border:none;
+  background:transparent;
 }
 
-.file-item:hover {
-  background: #f7f7f7;
+.file-item{
+  display:flex;
+  align-items:center;
+  gap:16px;                /* icon + text gap */
+  padding:12px;
+  margin-bottom:16px;      /* GAP BETWEEN FILES */
+  background:#ffffff;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  cursor:pointer;
+  transition:0.2s;
 }
 
-.thumb {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 1px solid #ccc;
+.file-item:hover{
+  background:#f1f5ff;
 }
+
+.file-item img{
+  width:60px;
+  height:60px;
+  border-radius:8px;
+  object-fit:cover;
+  border:1px solid #ddd;
+}
+
+.file-list .title{
+  flex:1;
+  font-weight:600;
+  font-size:17px;
+  color:#0f172a;
+}
+
+/* Panel Layout */
 .panel-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:16px;
 }
+
 .panel-section.full{grid-column:1/-1}
 
-/* File list */
-.file-list{list-style:none;padding:0;margin:0}
-.file-list li {
-  padding: 0;
-  border: none;
-  background: transparent;
-}
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-}
-.file-list .title{
-  flex:1;
-  font-weight:600;
-  color:#0f172a;
-  cursor:pointer;
-}
-.file-list .meta{color:var(--muted); font-size:13px; margin-right:8px}
-.file-list .actions button{margin-left:6px}
-
 /* Messages */
-.message{margin-top:6px; font-size:14px; color:var(--muted)}
+.message{
+  margin-top:6px;
+  font-size:14px;
+  color:var(--muted)
+}
 .message.success{color:var(--success)}
 .message.error{color:var(--danger)}
 
@@ -152,7 +165,7 @@ h3{margin:0 0 8px}
 }
 
 /* Responsive */
-@media (max-width:780px){
+@media(max-width:780px){
   .panel-grid{grid-template-columns:1fr}
   h1{font-size:22px}
   .btn{padding:8px 10px}
@@ -160,7 +173,9 @@ h3{margin:0 0 8px}
 }
 
 /* Footer */
-.footer{margin-top:12px; text-align:center; font-size:13px; color:var(--muted)}
-
-
-
+.footer{
+  margin-top:12px;
+  text-align:center;
+  font-size:13px;
+  color:var(--muted)
+}
