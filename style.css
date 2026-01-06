@@ -1,228 +1,351 @@
-// ---------------------------
-// Extract Drive File ID
-// ---------------------------
-function extractDriveFileId(url) {
-
-    // 1) embeddedfolderview?id=xxxx
-    let match0 = url.match(/embeddedfolderview\?id=([a-zA-Z0-9_-]+)/);
-    if (match0) return match0[1];
-
-    // 2) /file/d/xxxx/
-    let match1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (match1) return match1[1];
-
-    // 3) open?id=xxxx
-    let match2 = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
-    if (match2) return match2[1];
-
-    // 4) uc?id=xxxx
-    let match3 = url.match(/uc\?id=([a-zA-Z0-9_-]+)/);
-    if (match3) return match3[1];
-
-    return null;
+:root{
+  --bg:#f6f8fb;
+  --card:#ffffff;
+  --accent:#2b6ef6;
+  --accent-2:#1f4bd8;
+  --muted:#6b7280;
+  --danger:#e02424;
+  --success:#16a34a;
 }
 
-// ---------------------------
-// Get Thumbnail URL
-// ---------------------------
-function getThumbnailUrl(url) {
+*{box-sizing:border-box}
+html,body{height:100%}
 
-    // Folder Detect
-    if (url.includes("embeddedfolderview") || url.includes("folders")) {
-        return "https://cdn-icons-png.flaticon.com/512/716/716784.png"; 
-    }
-
-    const id = extractDriveFileId(url);
-
-    if (!id) return "https://via.placeholder.com/100";
-
-    return `https://drive.google.com/thumbnail?id=${id}`;
+body{
+  margin:0;
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg,#eef2ff 0%, #f6f8fb 100%);
+  color:#111827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
 }
 
-var firebaseConfig = {
-    apiKey: "AIzaSyDMLkQa5ZtsezKD9BLMpQt1cmZcYThUjPs",
-    authDomain: "family-photo-b81a9.firebaseapp.com",
-    databaseURL: "https://family-photo-b81a9-default-rtdb.firebaseio.com",
-    projectId: "family-photo-b81a9",
-    storageBucket: "family-photo-b81a9.firebasestorage.app",
-    messagingSenderId: "638306894478",
-    appId: "1:638306894478:web:63e2a8600e5ffdb396ffdf"
-};
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.database();
-
-// ---------------------------
-function hideAll() {
-    document.querySelectorAll("section").forEach(x => x.classList.add("hidden"));
+.container{
+  width:100%;
+  max-width:900px;
 }
 
-function showHome() {
-    hideAll();
-    document.getElementById("userLoginPage").classList.remove("hidden");
+/* General */
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 6px 24px rgba(15,23,42,0.08);
+  margin-bottom:16px;
 }
 
-function showAdminLogin() {
-    hideAll();
-    document.getElementById("adminLoginPage").classList.remove("hidden");
+.hidden{display:none}
+
+/* Home */
+#userLoginPage{
+  text-align:center;
+  padding:40px;
+  background: linear-gradient(180deg, rgba(43,110,246,0.06), rgba(31,75,216,0.03));
+  border-radius:12px;
 }
 
-// ---------------------------
-function adminLogin() {
-    let email = document.getElementById("adminEmail").value;
-    let pass = document.getElementById("adminPassword").value;
+/* Headings */
+h1{margin:0 0 10px;font-size:28px}
+h2{margin:0 0 12px}
+h3{margin:0 0 8px}
 
-    firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => {
-            loadFilesForAdmin();
-            hideAll();
-            document.getElementById("adminPanel").classList.remove("hidden");
-        })
-        .catch(err => showMessage("adminLoginMsg", err.message));
+/* Buttons */
+.btn{
+  background:var(--card);
+  color:var(--accent-2);
+  border:1px solid rgba(31,75,216,0.15);
+  padding:8px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-right:8px;
+  transition:0.08s ease;
+  box-shadow: 0 2px 6px rgba(14,22,60,0.04);
+}
+.btn:hover{transform:translateY(-2px)}
+.btn.primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:white; border:0
+}
+.btn.ghost{
+  background:transparent;
+  color:var(--accent-2);
+  border:1px dashed rgba(31,75,216,0.12)
+}
+.btn.danger{
+  background:linear-gradient(90deg,var(--danger),#a61b1b);
+  color:white;
+  border:0
 }
 
-// ---------------------------
-function userLogin() {
-    let input = document.getElementById("userPasswordInput").value;
-
-    db.ref("settings/userPassword").once("value", snap => {
-        if (snap.val() === input) {
-            loadFilesForUser();
-            hideAll();
-            document.getElementById("userPanel").classList.remove("hidden");
-        } else {
-            showMessage("userLoginMsg", "ভুল পাসওয়ার্ড!");
-        }
-    });
+/* Inputs */
+.form input,
+.user-controls input,
+.panel-section input{
+  width:100%;
+  padding:10px 12px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #e6eef8;
+  background:#fbfdff;
+  outline:none;
+  font-size:15px;
 }
 
-// ---------------------------
-function updateUserPassword() {
-    let newPass = document.getElementById("newUserPassword").value;
-
-    db.ref("settings/userPassword").set(newPass);
-    showMessage("updatePasswordMsg", "User Password Updated!");
+/* File List (PERFECT FIXED VERSION) */
+.file-list{
+  list-style:none;
+  padding:0;
+  margin:0;
 }
 
-// ---------------------------
-function addFile() {
-    let title = document.getElementById("fileTitle").value;
-    let link = document.getElementById("fileLink").value;
-
-    let encoded = btoa(link);
-
-    db.ref("files").push({
-        title: title,
-        link: encoded
-    });
-
-    document.getElementById("fileTitle").value = "";
-    document.getElementById("fileLink").value = "";
-
-    showMessage("addFileMsg", "File Added!");
-    loadFilesForAdmin();
+.file-list li{
+  padding:0;
+  border:none;
+  background:transparent;
 }
 
-// ---------------------------
-function deleteFile(id) {
-    db.ref("files/" + id).remove();
-    loadFilesForAdmin();
+.file-item{
+  display:flex;
+  align-items:center;
+  gap:16px;                /* icon + text gap */
+  padding:12px;
+  margin-bottom:16px;      /* GAP BETWEEN FILES */
+  background:#ffffff;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  cursor:pointer;
+  transition:0.2s;
 }
 
-// ---------------------------
-function loadFilesForAdmin() {
-    db.ref("files").on("value", snap => {
-        let box = document.getElementById("adminFileList");
-        box.innerHTML = "";
-
-        snap.forEach(child => {
-            let data = child.val();
-
-            box.innerHTML += `
-                <li>
-                    <span class="title">${data.title}</span>
-                    <div class="actions">
-                      <button onclick="openSecureLink('${data.link}')">Open</button>
-                      <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
-                    </div>
-                </li>
-            `;
-        });
-    });
+.file-item:hover{
+  background:#f1f5ff;
 }
 
-// ---------------------------
-// Load Files User (With Thumbnail)
-// ---------------------------
-function loadFilesForUser() {
-    db.ref("files").on("value", snap => {
-        let box = document.getElementById("userFileList");
-        box.innerHTML = "";
-
-        snap.forEach(child => {
-            let data = child.val();
-            let fileUrl = atob(data.link);
-            let thumb = getThumbnailUrl(fileUrl);
-
-            box.innerHTML += `
-                <li onclick="openSecureLink('${data.link}')" class="file-item">
-                    <img src="${thumb}" class="thumb">
-                    <span class="title">${data.title}</span>
-                </li>
-            `;
-        });
-    });
+.file-item img{
+  width:60px;
+  height:60px;
+  border-radius:8px;
+  object-fit:cover;
+  border:1px solid #ddd;
 }
 
-// ---------------------------
-function searchFiles() {
-    let input = document.getElementById("searchInput").value.toLowerCase();
-
-    document.querySelectorAll("#userFileList li").forEach(item => {
-        item.style.display = item.innerText.toLowerCase().includes(input) ? "flex" : "none";
-    });
+.file-list .title{
+  flex:1;
+  font-weight:600;
+  font-size:17px;
+  color:#0f172a;
 }
 
-// ---------------------------
-function openSecureLink(encoded) {
-    let url = atob(encoded);
-    window.open(url, "_blank"); // নতুন ট্যাবে Google Drive খুলবে
+/* Panel Layout */
+.panel-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
 }
 
-// ---------------------------
-function logout() {
-    firebase.auth().signOut();
-    showHome();
+.panel-section.full{grid-column:1/-1}
+
+/* Messages */
+.message{
+  margin-top:6px;
+  font-size:14px;
+  color:var(--muted)
+}
+.message.success{color:var(--success)}
+.message.error{color:var(--danger)}
+
+/* Header */
+.panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
 }
 
-// ---------------------------
-function showMessage(id, msg) {
-    let box = document.getElementById(id);
-    box.innerText = msg;
-
-    box.classList.add("success");
-
-    setTimeout(() => {
-        box.innerText = "";
-        box.classList.remove("success");
-    }, 2000);
+/* Responsive */
+@media(max-width:780px){
+  .panel-grid{grid-template-columns:1fr}
+  h1{font-size:22px}
+  .btn{padding:8px 10px}
+  .container{padding:6px}
 }
 
-// EXPORT
-window.showAdminLogin = showAdminLogin;
-window.adminLogin = adminLogin;
-window.userLogin = userLogin;
-window.updateUserPassword = updateUserPassword;
-window.addFile = addFile;
-window.deleteFile = deleteFile;
-window.openSecureLink = openSecureLink;
-window.searchFiles = searchFiles;
-window.logout = logout;
-window.showHome = showHome;
+/* Footer */
+.footer{
+  margin-top:12px;
+  text-align:center;
+  font-size:13px;
+  color:var(--muted)
+}
+/* ✅ Always fix logout button scrolling issue */
+.logout-btn {
+    width: 100%;
+    background: #ff4d4d;
+    color: white;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    margin-top: 25px;
+    cursor: pointer;
 
+    position: static !important;
+    bottom: auto !important;
+    left: auto !important;
+}
 
+/* ✅ Prevent body scroll freeze */
+html, body {
+    height: auto !important;
+    overflow-y: auto !important;
+}
 
+/* ✅ Ensure preview area doesn't break layout */
+.preview-box {
+    max-height: none !important;
+    overflow: visible !important;
+}
 
+/* ✅ If any wrapper using fixed height */
+.container,
+.main-wrapper,
+.content {
+    height: auto !important;
+    overflow: visible !important;
+}
+/* ===== YouTube-style Login UI (JS Safe) ===== */
 
+.login-section {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 450px; /* enough space for animation */
+}
 
+.login-section.hidden {
+  display: none;
+}
 
+/* ===== Animated Circle ===== */
+.circle-container {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  left: -150px;
+  border-radius: 50%;
+  background: conic-gradient(#ffa500, #ff8c00, #ffa500);
+  animation: rotate 20s linear infinite;
+  z-index: 0;
+  opacity: 0.15;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Login Box ===== */
+.login-box {
+  position: relative;
+  z-index: 10;
+  background: rgba(30,42,58,0.95);
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.login-box h2 {
+  font-size: 32px;
+  color: #ffa500;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border-radius: 25px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  border-color: #ffa500;
+  box-shadow: 0 0 15px rgba(255,165,0,0.3);
+}
+
+.input-group input::placeholder {
+  color: rgba(255,255,255,0.5);
+}
+
+.input-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: rgba(255,255,255,0.5);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 25px;
+  border: none;
+  background: linear-gradient(90deg,#ffa500,#ff8c00);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(255,165,0,0.5);
+}
+
+.signup-link {
+  margin-top: 20px;
+}
+
+.signup-link a {
+  color: #ffa500;
+  text-decoration: none;
+}
+
+/* ===== Responsive ===== */
+@media(max-width:480px) {
+  .login-box { padding: 30px; }
+  .circle-container {
+      width: 300px;
+      height: 300px;
+      top: -80px;
+      left: -80px;
+  }
+}
+.login-section { position: relative; overflow: hidden; min-height: 450px; }
+
+.circle-container { position: absolute; top: -150px; left: -150px; width: 500px; height: 500px; animation: rotate 20s linear infinite; opacity: 0.15; }
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
