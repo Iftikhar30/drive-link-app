@@ -208,6 +208,31 @@ function showMessage(id, msg) {
     }, 2000);
 }
 
+function userLogin() {
+    let input = document.getElementById("userPasswordInput").value;
+    db.ref("settings/userPassword").once("value", snap => {
+        if (snap.val() === input) {
+            loadFilesForUser();
+            hideAll();
+            document.getElementById("userPanel").classList.remove("hidden");
+        } else {
+            showMessage("userLoginMsg", "ভুল পাসওয়ার্ড!");
+        }
+    });
+}
+
+function adminLogin() {
+    let email = document.getElementById("adminEmail").value;
+    let pass = document.getElementById("adminPassword").value;
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+        .then(() => {
+            loadFilesForAdmin();
+            hideAll();
+            document.getElementById("adminPanel").classList.remove("hidden");
+        })
+        .catch(err => showMessage("adminLoginMsg", err.message));
+}
+
 // EXPORT
 window.showAdminLogin = showAdminLogin;
 window.adminLogin = adminLogin;
@@ -219,6 +244,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
