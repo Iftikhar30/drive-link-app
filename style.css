@@ -215,19 +215,18 @@ html, body {
     height: auto !important;
     overflow: visible !important;
 }
-/* 🔵 Rotating Glow Ring Animation */
-.glow-wrapper{
+/* ===== Animated Login Form Styles ===== */
+.login-container {
   position: relative;
-  padding: 6px;
-  border-radius: 18px;
-  display: inline-block;
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
 }
 
-.glow-wrapper::before{
-  content: "";
+.circle-container {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   background: conic-gradient(
     from 0deg,
     #00f2ff,
@@ -235,23 +234,80 @@ html, body {
     #0066ff,
     #00f2ff
   );
-  filter: blur(2px);
-  animation: spinGlow 3s linear infinite;
+  filter: blur(6px);
+  animation: rotateRing 4s linear infinite;
   z-index: 0;
 }
 
-.glow-wrapper .card{
+.login-box {
   position: relative;
   z-index: 1;
+  background: var(--card);
+  padding: 30px 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(15,23,42,0.1);
 }
 
-/* 🔄 Rotation Animation */
-@keyframes spinGlow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.login-box h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--accent-2);
 }
 
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #e6eef8;
+  background: #fbfdff;
+  outline: none;
+}
+
+.input-group .input-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-2);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg,var(--accent),var(--accent-2));
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+}
+
+/* 🔄 Circle rotate animation */
+@keyframes rotateRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Message styling */
+.message {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.message.success { color: var(--success); }
+.message.error { color: var(--danger); }
+
+/* Responsive */
+@media(max-width:480px){
+  .login-box { padding: 25px 20px; }
+}
