@@ -186,12 +186,7 @@ function searchFiles() {
 // ---------------------------
 function openSecureLink(encoded) {
     let url = atob(encoded);
-
-    let box = document.getElementById("filePreviewBox");
-    let frame = document.getElementById("filePreviewFrame");
-
-    frame.src = url;
-    box.classList.remove("hidden");
+    window.open(url, "_blank"); // সরাসরি Google Drive এ ওপেন হবে
 }
 
 // ---------------------------
@@ -224,6 +219,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
