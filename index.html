@@ -15,81 +15,61 @@
   <div class="container">
 
     <!-- FIXED: Only ONE user login section -->
-<div class="glow-wrapper">
-  <section id="userLoginPage" class="card">
-    <section id="userLoginPage" class="card">
-      <h2>স্বাগতম আমার ভাবনাগুলোতে</h2>
+<section id="userLoginPage" class="card">
+  <div class="login-container">
+    <div class="circle-container" id="circleContainer"></div>
+    <div class="login-box">
+      <h2>User Login</h2>
 
-      <div class="form">
-        <input id="userPasswordInput" type="password" placeholder="পাসওয়ার্ড দিন..." />
-
-        <div class="buttons">
-          <button class="btn primary" onclick="userLogin()">Enter</button>
+      <form onsubmit="userLogin(); return false;" id="userLoginForm">
+        <div class="input-group">
+          <input id="userPasswordInput" type="password" placeholder="Enter Password" required />
+          <span class="input-icon">
+            <i class="fa-solid fa-lock"></i>
+          </span>
         </div>
 
-        <div id="userLoginMsg" class="message"></div>
+        <button type="submit" class="login-btn">LOGIN</button>
+      </form>
 
-        <p style="margin-top:12px; font-size:13px; text-align:right;">
-          <a href="#" onclick="showAdminLogin()">Admin Login</a>
-        </p>
-      </div>
-    </section>
-  </section>
-</div>
+      <p style="margin-top:12px; font-size:13px; text-align:right;">
+        <a href="#" onclick="showAdminLogin()">Admin Login</a>
+      </p>
 
+      <div id="userLoginMsg" class="message"></div>
+    </div>
+  </div>
+</section>
     <!-- ADMIN LOGIN -->
-<div class="glow-wrapper">
-  <section id="adminLoginPage" class="hidden card">
-    <section id="adminLoginPage" class="hidden card">
+<section id="adminLoginPage" class="hidden card">
+  <div class="login-container">
+    <div class="circle-container" id="circleContainer"></div>
+    <div class="login-box">
       <h2>Admin Login</h2>
-      <div class="form">
-        <input id="adminEmail" type="email" placeholder="Email" />
-        <input id="adminPassword" type="password" placeholder="Password" />
-        <div class="buttons">
-          <button class="btn primary" onclick="adminLogin()">Login</button>
-          <button class="btn ghost" onclick="showHome()">Back</button>
-        </div>
-        <div id="adminLoginMsg" class="message"></div>
-      </div>
-    </section>
-  </section>
-</div>
-    <!-- ADMIN PANEL -->
-    <section id="adminPanel" class="hidden card">
-      <div class="panel-header">
-        <h2>Admin Panel</h2>
-        <div>
-          <button class="btn danger" onclick="logout()">Logout</button>
-        </div>
-      </div>
 
-      <div class="panel-grid">
-        <div class="panel-section">
-          <h3>Manage User Password</h3>
-          <input id="newUserPassword" type="text" placeholder="New user password" />
-          <div class="buttons">
-            <button class="btn" onclick="updateUserPassword()">Update Password</button>
-          </div>
-          <div id="updatePasswordMsg" class="message"></div>
+      <form onsubmit="adminLogin(); return false;" id="adminLoginForm">
+        <div class="input-group">
+          <input id="adminEmail" type="email" placeholder="Email" required />
+          <span class="input-icon">
+            <i class="fa-solid fa-envelope"></i>
+          </span>
         </div>
 
-        <div class="panel-section">
-          <h3>Add File</h3>
-          <input id="fileTitle" type="text" placeholder="File title" />
-          <input id="fileLink" type="text" placeholder="Google Drive shareable link" />
-          <div class="buttons">
-            <button class="btn" onclick="addFile()">Add File</button>
-          </div>
-          <div id="addFileMsg" class="message"></div>
+        <div class="input-group">
+          <input id="adminPassword" type="password" placeholder="Password" required />
+          <span class="input-icon">
+            <i class="fa-solid fa-lock"></i>
+          </span>
         </div>
 
-        <div class="panel-section full">
-          <h3>Files</h3>
-          <ul id="adminFileList" class="file-list"></ul>
-        </div>
-      </div>
-    </section>
+        <button type="submit" class="login-btn">LOGIN</button>
+        <button class="btn ghost" onclick="showHome(); return false;">Back</button>
+      </form>
 
+      <div id="adminLoginMsg" class="message"></div>
+    </div>
+  </div>
+</section>
     <!-- USER PANEL -->
     <section id="userPanel" class="hidden card">
       <div class="panel-header">
@@ -118,5 +98,6 @@
   <script src="app.js"></script>
 </body>
 </html>
+
 
 
