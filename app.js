@@ -139,14 +139,17 @@ function loadFilesForAdmin() {
             let data = child.val();
 
             box.innerHTML += `
-                <li>
-                    <span class="title">${data.title}</span>
-                    <div class="actions">
-                      <button onclick="openSecureLink('${data.link}')">Open</button>
-                      <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
-                    </div>
-                </li>
-            `;
+    <li>
+        <span class="title">${data.title}</span>
+        <div class="actions">
+          <button onclick="openSecureLink('${data.link}')">Open</button>
+          <button class="btn" onclick="editFile('${child.key}','${data.title}','${data.link}')">Edit</button>
+          <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
+        </div>
+    </li>
+`;
+
+            
         });
     });
 }
@@ -207,6 +210,24 @@ function showMessage(id, msg) {
         box.classList.remove("success");
     }, 2000);
 }
+
+function editFile(id, oldTitle, oldLink) {
+    // Prompt ব্যবহার করে নতুন value নিন
+    let newTitle = prompt("Enter new file title:", oldTitle);
+    if(newTitle === null) return; // Cancel করলে exit
+
+    let newLink = prompt("Enter new file link:", atob(oldLink));
+    if(newLink === null) return;
+
+    // Update Firebase
+    db.ref("files/" + id).update({
+        title: newTitle,
+        link: btoa(newLink)  // Encode again
+    });
+
+    loadFilesForAdmin(); // List refresh
+}
+
 
 // EXPORT
 window.showAdminLogin = showAdminLogin;
