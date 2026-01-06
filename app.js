@@ -131,28 +131,37 @@ function deleteFile(id) {
 
 // ---------------------------
 function loadFilesForAdmin() {
-    db.ref("files").on("value", snap => {
-        let box = document.getElementById("adminFileList");
-        box.innerHTML = "";
+    db.ref("files").once("value", snap => {
+        let box = document.getElementById("adminFileList");
+        box.innerHTML = "";
 
-        snap.forEach(child => {
-            let data = child.val();
+        // Convert snapshot to array & sort by order
+        let filesArray = [];
+        snap.forEach(child => {
+            let data = child.val();
+            data.key = child.key;
+            filesArray.push(data);
+        });
 
-            box.innerHTML += `
-    <li>
-        <span class="title">${data.title}</span>
-        <div class="actions">
-          <button onclick="openSecureLink('${data.link}')">Open</button>
-          <button class="btn" onclick="editFile('${child.key}','${data.title}','${data.link}')">Edit</button>
-          <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
-        </div>
-    </li>
-`;
+        filesArray.sort((a,b) => (a.order||0) - (b.order||0));
 
-            
-        });
-    });
+        filesArray.forEach(data => {
+            box.innerHTML += `
+                <li class="draggable" data-key="${data.key}">
+                    <span class="title">${data.title}</span>
+                    <div class="actions">
+                      <button onclick="openSecureLink('${data.link}')">Open</button>
+                      <button class="btn" onclick="editFile('${data.key}','${data.title}','${data.link}')">Edit</button>
+                      <button class="btn danger" onclick="deleteFile('${data.key}')">Delete</button>
+                    </div>
+                </li>
+            `;
+        });
+
+        enableDragDrop();
+    });
 }
+
 
 // ---------------------------
 // Load Files User (With Thumbnail)
@@ -228,6 +237,67 @@ function editFile(id, oldTitle, oldLink) {
     loadFilesForAdmin(); // List refresh
 }
 
+function enableDragDrop() {
+    const list = document.getElementById("adminFileList");
+    let dragSrcEl = null;
+
+    function handleDragStart(e) {
+        dragSrcEl = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+        this.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter() { this.classList.add('over'); }
+    function handleDragLeave() { this.classList.remove('over'); }
+
+    function handleDrop(e) {
+        e.stopPropagation();
+        if (dragSrcEl !== this) {
+            // Swap innerHTML
+            let temp = dragSrcEl.innerHTML;
+            dragSrcEl.innerHTML = this.innerHTML;
+            this.innerHTML = temp;
+
+            // Update Firebase order
+            updateOrderInFirebase();
+        }
+        return false;
+    }
+
+    function handleDragEnd() {
+        list.querySelectorAll('li').forEach(item => {
+            item.classList.remove('over', 'dragging');
+        });
+    }
+
+    list.querySelectorAll('.draggable').forEach(item => {
+        item.setAttribute('draggable', true);
+        item.addEventListener('dragstart', handleDragStart, false);
+        item.addEventListener('dragenter', handleDragEnter, false);
+        item.addEventListener('dragover', handleDragOver, false);
+        item.addEventListener('dragleave', handleDragLeave, false);
+        item.addEventListener('drop', handleDrop, false);
+        item.addEventListener('dragend', handleDragEnd, false);
+    });
+}
+
+// Update Firebase order after drag
+function updateOrderInFirebase() {
+    const list = document.getElementById("adminFileList");
+    const items = list.querySelectorAll('li');
+
+    items.forEach((li, index) => {
+        const key = li.getAttribute('data-key');
+        db.ref("files/" + key).update({ order: index });
+    });
+}
 
 // EXPORT
 window.showAdminLogin = showAdminLogin;
@@ -240,6 +310,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
