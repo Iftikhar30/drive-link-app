@@ -186,14 +186,7 @@ function searchFiles() {
 // ---------------------------
 function openSecureLink(encoded) {
     let url = atob(encoded);
-
-    // যদি এটা ফোল্ডার লিংক হয়, তাহলে drive folder view তে পাঠাবে
-    if (url.includes("folders")) {
-        window.location.href = url;
-    } else {
-        // ফাইল হলেও সরাসরি Google Drive এ খুলবে
-        window.location.href = url;
-    }
+    window.open(url, "_blank"); // নতুন ট্যাবে Google Drive খুলবে
 }
 
 // ---------------------------
@@ -226,6 +219,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
