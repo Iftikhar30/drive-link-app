@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Secure Drive File Manager (SDFM)</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 
   <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -15,72 +13,53 @@
 </head>
 <body>
   <div class="container">
-
+    
     <!-- FIXED: Only ONE user login section -->
-    <section id="userLoginPage" class="card">
-      <div class="login-ui-wrapper">
-        <div class="container">
-          <div class="circle-container"></div>
-    
-          <div class="login-box">
-            <h2>User Login</h2>
-    
-            <div class="input-group">
+    <!-- USER LOGIN -->
+    <section id="userLoginPage" class="card login-section">
+      <!-- Animated Circle -->
+      <div class="circle-container"></div>
+  
+      <div class="login-box">
+          <h2>WELCOME</h2>
+          <h1>আমার ভাবনাগুলোতে</h1>
+          <div class="input-group">
               <input id="userPasswordInput" type="password" placeholder="পাসওয়ার্ড দিন..." />
-              <span class="input-icon">
-                <i class="fa-solid fa-lock"></i>
-              </span>
-            </div>
-    
-            <button class="login-btn" onclick="userLogin()">Enter</button>
-    
-            <div id="userLoginMsg" class="message"></div>
-    
-            <div class="signup-link">
+              <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+          </div>
+          <button class="login-btn" onclick="userLogin()">Enter</button>
+          <div id="userLoginMsg" class="message"></div>
+          <div class="signup-link">
               <a href="#" onclick="showAdminLogin()">Admin Login</a>
-            </div>
           </div>
-        </div>
       </div>
-    </section>
-    
-
-    <!-- ADMIN LOGIN -->
-    <section id="adminLoginPage" class="hidden card">
-      <div class="login-ui-wrapper">
-        <div class="container">
-          <div class="circle-container"></div>
-    
-          <div class="login-box">
-            <h2>Admin Login</h2>
-    
-            <div class="input-group">
+  </section>
+  <!-- Admin Login -->
+  <section id="adminLoginPage" class="card login-section hidden">
+      <!-- Animated Circle -->
+      <div class="circle-container"></div>
+  
+      <div class="login-box">
+          <h2>Admin Login</h2>
+          <div class="input-group">
               <input id="adminEmail" type="email" placeholder="Email" />
-              <span class="input-icon">
-                <i class="fa-solid fa-envelope"></i>
-              </span>
-            </div>
-    
-            <div class="input-group">
-              <input id="adminPassword" type="password" placeholder="Password" />
-              <span class="input-icon">
-                <i class="fa-solid fa-lock"></i>
-              </span>
-            </div>
-    
-            <button class="login-btn" onclick="adminLogin()">Login</button>
-    
-            <div id="adminLoginMsg" class="message"></div>
-    
-            <div class="signup-link">
-              <a href="#" onclick="showHome()">Back</a>
-            </div>
+              <span class="input-icon"><i class="fa-solid fa-envelope"></i></span>
           </div>
-        </div>
+          <div class="input-group">
+              <input id="adminPassword" type="password" placeholder="Password" />
+              <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+          </div>
+          <button class="login-btn" onclick="adminLogin()">Login</button>
+          <div id="adminLoginMsg" class="message"></div>
+          <div class="signup-link">
+              <a href="#" onclick="showHome()">Back</a>
+          </div>
       </div>
-    </section>
-    
+  </section>
+  
 
+  
+  
     <!-- ADMIN PANEL -->
     <section id="adminPanel" class="hidden card">
       <div class="panel-header">
