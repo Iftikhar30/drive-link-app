@@ -215,99 +215,84 @@ html, body {
     height: auto !important;
     overflow: visible !important;
 }
-/* ===== Animated Login Form Styles ===== */
-.login-container {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-  margin: auto;
+/* ===== Login UI Override (YouTube Template Integrated) ===== */
+
+.login-ui-wrapper{
+  display:flex;
+  justify-content:center;
 }
 
-.circle-container {
+.login-ui-wrapper .container{
+  position: relative;
+  width: 340px;
+  height: 340px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-ui-wrapper .circle-container{
   position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: conic-gradient(
-    from 0deg,
-    #00f2ff,
-    #00c3ff,
-    #0066ff,
-    #00f2ff
-  );
-  filter: blur(6px);
-  animation: rotateRing 4s linear infinite;
-  z-index: 0;
-}
-
-.login-box {
-  position: relative;
-  z-index: 1;
-  background: var(--card);
-  padding: 30px 25px;
-  border-radius: 16px;
-  box-shadow: 0 6px 24px rgba(15,23,42,0.1);
-}
-
-.login-box h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: var(--accent-2);
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.input-group input {
   width: 100%;
-  padding: 12px 40px 12px 12px;
-  border-radius: 12px;
-  border: 1px solid #e6eef8;
-  background: #fbfdff;
-  outline: none;
+  height: 100%;
+  animation: rotate 20s linear infinite;
 }
 
-.input-group .input-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--accent-2);
+.login-ui-wrapper .login-box{
+  background: rgba(30, 42, 58, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  color:#fff;
 }
 
-.login-btn {
+.login-ui-wrapper h2{
+  color:#ffa500;
+  text-align:center;
+  margin-bottom:30px;
+}
+
+.login-ui-wrapper .input-group{
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.login-ui-wrapper .input-group input{
   width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: linear-gradient(90deg,var(--accent),var(--accent-2));
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
+  padding: 12px 40px 12px 15px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color:#fff;
 }
 
-.login-btn:hover {
-  opacity: 0.9;
+.login-ui-wrapper .input-icon{
+  position:absolute;
+  right:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:rgba(255,255,255,0.6);
 }
 
-/* 🔄 Circle rotate animation */
-@keyframes rotateRing {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.login-ui-wrapper .login-btn{
+  width:100%;
+  padding:14px;
+  border-radius:25px;
+  border:none;
+  background:linear-gradient(90deg,#ffa500,#ff8c00);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
 }
 
-/* Message styling */
-.message {
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--muted);
+.login-ui-wrapper .signup-link{
+  margin-top:20px;
+  text-align:center;
 }
 
-.message.success { color: var(--success); }
-.message.error { color: var(--danger); }
-
-/* Responsive */
-@media(max-width:480px){
-  .login-box { padding: 25px 20px; }
+.login-ui-wrapper .signup-link a{
+  color:#ffa500;
+  text-decoration:none;
 }
+
