@@ -1,3 +1,26 @@
+// Delete Modal Global State
+// ===========================
+let deleteTargetKey = null;
+
+function askDelete(key) {
+    deleteTargetKey = key;
+    document.getElementById("deleteModal").classList.remove("hidden");
+}
+function closeDeleteModal() {
+    deleteTargetKey = null;
+    document.getElementById("deleteModal").classList.add("hidden");
+}
+document.getElementById("confirmDeleteBtn").onclick = function () {
+    if (!deleteTargetKey) return;
+
+    db.ref("files/" + deleteTargetKey).remove()
+        .then(() => {
+            closeDeleteModal();
+            loadFilesForAdmin();
+        });
+};
+
+
 // ---------------------------
 // Extract Drive File ID
 // ---------------------------
@@ -147,7 +170,7 @@ function loadFilesForAdmin() {
                     <div class="actions">
                         <button onclick="openSecureLink('${data.link}')">Open</button>
                         <button class="btn" onclick="editFile('${child.key}','${data.title}','${data.link}')">Edit</button>
-                        <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
+                        <button class="btn danger" onclick="askDelete('${child.key}')">Delete</button>
                     </div>
                 </li>
             `;
@@ -323,6 +346,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
