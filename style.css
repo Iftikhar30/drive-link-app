@@ -351,23 +351,18 @@ html, body {
 }
 
 .draggable {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background: #fff;
-    cursor: grab;
-    transition: background 0.2s;
+    cursor: grab;
+    user-select: none;
 }
 
 .draggable.dragging {
-    opacity: 0.5;
+    opacity: 0.5;
+    background: #fff3cd;
+}
 }
 
 .draggable.over {
     border: 2px dashed #ffa500;
 }
+
 
