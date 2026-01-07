@@ -131,43 +131,42 @@ function deleteFile(id) {
 
 // ---------------------------
 function loadFilesForAdmin() {
-    db.ref("files").once("value", snap => {
-        let box = document.getElementById("adminFileList");
-        box.innerHTML = "";
+    db.ref("files")
+      .orderByChild("order")   // 🔥 এই লাইনটা সবচেয়ে গুরুত্বপূর্ণ
+      .once("value", snap => {
 
-        // Convert snapshot to array & sort by order
-        let filesArray = [];
-        snap.forEach(child => {
-            let data = child.val();
-            data.key = child.key;
-            filesArray.push(data);
-        });
+        let box = document.getElementById("adminFileList");
+        box.innerHTML = "";
 
-        filesArray.sort((a,b) => (a.order||0) - (b.order||0));
+        snap.forEach(child => {
+            let data = child.val();
 
-        filesArray.forEach(data => {
-            box.innerHTML += `
-                <li class="draggable" data-key="${data.key}">
-                    <span class="title">${data.title}</span>
-                    <div class="actions">
-                      <button onclick="openSecureLink('${data.link}')">Open</button>
-                      <button class="btn" onclick="editFile('${data.key}','${data.title}','${data.link}')">Edit</button>
-                      <button class="btn danger" onclick="deleteFile('${data.key}')">Delete</button>
-                    </div>
-                </li>
-            `;
-        });
+            box.innerHTML += `
+                <li class="draggable" data-key="${child.key}">
+                    <span class="title">${data.title}</span>
+                    <div class="actions">
+                        <button onclick="openSecureLink('${data.link}')">Open</button>
+                        <button class="btn" onclick="editFile('${child.key}','${data.title}','${data.link}')">Edit</button>
+                        <button class="btn danger" onclick="deleteFile('${child.key}')">Delete</button>
+                    </div>
+                </li>
+            `;
+        });
 
-        enableDragDrop();
-    });
+        enableDragAndDrop();
+    });
 }
+
 
 
 // ---------------------------
 // Load Files User (With Thumbnail)
 // ---------------------------
 function loadFilesForUser() {
-    db.ref("files").on("value", snap => {
+    db.ref("files")
+      .orderByChild("order")   // 🔥 এখানেও MUST
+      .on("value", snap => {
+
         let box = document.getElementById("userFileList");
         box.innerHTML = "";
 
@@ -178,13 +177,14 @@ function loadFilesForUser() {
 
             box.innerHTML += `
                 <li onclick="openSecureLink('${data.link}')" class="file-item">
-                    <img src="${thumb}" class="thumb">
+                    <img src="${thumb}">
                     <span class="title">${data.title}</span>
                 </li>
             `;
         });
     });
 }
+
 
 // ---------------------------
 function searchFiles() {
@@ -288,6 +288,16 @@ function enableDragDrop() {
     });
 }
 
+function saveOrderToFirebase() {
+    const items = document.querySelectorAll("#adminFileList .draggable");
+
+    items.forEach((item, index) => {
+        const key = item.getAttribute("data-key");
+        db.ref("files/" + key + "/order").set(index);
+    });
+}
+
+
 // Update Firebase order after drag
 function updateOrderInFirebase() {
     const list = document.getElementById("adminFileList");
@@ -310,6 +320,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
