@@ -113,6 +113,20 @@
 
 
     </section>
+    
+    <!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal hidden">
+    <div class="modal-box">
+        <h3>⚠️ নিশ্চিতকরণ</h3>
+        <p>আপনি কি সত্যিই এই ফাইলটি ডিলিট করতে চান?</p>
+
+        <div class="modal-actions">
+            <button id="confirmDeleteBtn" class="btn danger">Delete</button>
+            <button onclick="closeDeleteModal()" class="btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
 
     <footer class="footer muted">
       <a href="https://wa.me/8801540162736" target="_blank" style="text-decoration:none; color:inherit;">
@@ -124,4 +138,5 @@
   <script src="app.js"></script>
 </body>
 </html>
+
 
