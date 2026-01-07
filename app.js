@@ -142,7 +142,7 @@ function loadFilesForAdmin() {
             let data = child.val();
 
             box.innerHTML += `
-                <li class="draggable" data-key="${child.key}">
+                <li class="draggable" data-key="${child.key}" draggable="true">
                     <span class="title">${data.title}</span>
                     <div class="actions">
                         <button onclick="openSecureLink('${data.link}')">Open</button>
@@ -237,56 +237,39 @@ function editFile(id, oldTitle, oldLink) {
     loadFilesForAdmin(); // List refresh
 }
 
-function enableDragDrop() {
-    const list = document.getElementById("adminFileList");
-    let dragSrcEl = null;
+function enableDragAndDrop() {
+    const list = document.getElementById("adminFileList");
 
-    function handleDragStart(e) {
-        dragSrcEl = this;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/html', this.innerHTML);
-        this.classList.add('dragging');
-    }
+    let draggingItem = null;
 
-    function handleDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-    }
+    list.querySelectorAll(".draggable").forEach(item => {
 
-    function handleDragEnter() { this.classList.add('over'); }
-    function handleDragLeave() { this.classList.remove('over'); }
+        item.addEventListener("dragstart", () => {
+            draggingItem = item;
+            item.classList.add("dragging");
+        });
 
-    function handleDrop(e) {
-        e.stopPropagation();
-        if (dragSrcEl !== this) {
-            // Swap innerHTML
-            let temp = dragSrcEl.innerHTML;
-            dragSrcEl.innerHTML = this.innerHTML;
-            this.innerHTML = temp;
+        item.addEventListener("dragend", () => {
+            item.classList.remove("dragging");
+            draggingItem = null;
+            saveOrderToFirebase();
+        });
+    });
 
-            // Update Firebase order
-            updateOrderInFirebase();
-        }
-        return false;
-    }
+    list.addEventListener("dragover", e => {
+        e.preventDefault();
+        const after = getDragAfterElement(list, e.clientY);
+        const dragging = document.querySelector(".dragging");
+        if (!dragging) return;
 
-    function handleDragEnd() {
-        list.querySelectorAll('li').forEach(item => {
-            item.classList.remove('over', 'dragging');
-        });
-    }
-
-    list.querySelectorAll('.draggable').forEach(item => {
-        item.setAttribute('draggable', true);
-        item.addEventListener('dragstart', handleDragStart, false);
-        item.addEventListener('dragenter', handleDragEnter, false);
-        item.addEventListener('dragover', handleDragOver, false);
-        item.addEventListener('dragleave', handleDragLeave, false);
-        item.addEventListener('drop', handleDrop, false);
-        item.addEventListener('dragend', handleDragEnd, false);
-    });
+        if (after == null) {
+            list.appendChild(dragging);
+        } else {
+            list.insertBefore(dragging, after);
+        }
+    });
 }
+
 
 function saveOrderToFirebase() {
     const items = document.querySelectorAll("#adminFileList .draggable");
@@ -308,6 +291,26 @@ function updateOrderInFirebase() {
         db.ref("files/" + key).update({ order: index });
     });
 }
+function getDragAfterElement(container, y) {
+    const items = [...container.querySelectorAll(".draggable:not(.dragging)")];
+
+    return items.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+        }
+        return closest;
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+function saveOrderToFirebase() {
+    document.querySelectorAll("#adminFileList .draggable")
+        .forEach((item, index) => {
+            const key = item.dataset.key;
+            db.ref("files/" + key + "/order").set(index);
+        });
+}
+
 
 // EXPORT
 window.showAdminLogin = showAdminLogin;
@@ -320,6 +323,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
