@@ -78,10 +78,11 @@ localStorage.setItem("deviceId", deviceId);
 function checkNotificationPermission() {
     const saved = localStorage.getItem("notifyAllowed");
 
-    if (saved === "yes") return;
-
-    document.getElementById("notifyBlocker").classList.remove("hidden");
+    if (saved !== "yes") {
+        document.getElementById("notifyBlocker").classList.remove("hidden");
+    }
 }
+
 
     
     ;
@@ -375,6 +376,22 @@ if (Notification.permission === "granted") {
     });
 }
 
+function requestNotify() {
+    if (!("Notification" in window)) {
+        alert("এই ব্রাউজার Notification সাপোর্ট করে না");
+        return;
+    }
+
+    Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+            localStorage.setItem("notifyAllowed", "yes");
+            document.getElementById("notifyBlocker").classList.add("hidden");
+            alert("Notification Enabled ✅");
+        } else {
+            alert("Notification Allow না করলে অ্যাপ ব্যবহার করা যাবে না!");
+        }
+    });
+}
 
 
 
@@ -389,6 +406,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
