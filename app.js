@@ -377,6 +377,12 @@ if (Notification.permission === "granted") {
 }
 
 function requestNotify() {
+
+    if (isInAppBrowser()) {
+        alert("⚠️ অনুগ্রহ করে Chrome বা Browser এ খুলুন\nতাহলেই Notification কাজ করবে");
+        return;
+    }
+
     if (!("Notification" in window)) {
         alert("এই ব্রাউজার Notification সাপোর্ট করে না");
         return;
@@ -394,6 +400,12 @@ function requestNotify() {
 }
 
 
+function isInAppBrowser() {
+    let ua = navigator.userAgent || navigator.vendor;
+    return /FBAN|FBAV|Instagram|Line|Twitter|WhatsApp|Telegram|Messenger/i.test(ua);
+}
+
+
 
 // EXPORT
 window.showAdminLogin = showAdminLogin;
@@ -406,6 +418,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
