@@ -71,21 +71,7 @@ var firebaseConfig = {
     messagingSenderId: "638306894478",
     appId: "1:638306894478:web:63e2a8600e5ffdb396ffdf"
 };
-firebase.initializeApp(firebaseConfig)
-    const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
-localStorage.setItem("deviceId", deviceId);
-
-function checkNotificationPermission() {
-    const saved = localStorage.getItem("notifyAllowed");
-
-    if (saved !== "yes") {
-        document.getElementById("notifyBlocker").classList.remove("hidden");
-    }
-}
-
-
-    
-    ;
+firebase.initializeApp(firebaseConfig);
 
 const db = firebase.database();
 
@@ -158,12 +144,6 @@ function addFile() {
 
     showMessage("addFileMsg", "File Added!");
     loadFilesForAdmin();
-    
-    db.ref("notifications").push({
-    title: title,
-    time: Date.now()
-});
-
 }
 
 // ---------------------------
@@ -354,58 +334,6 @@ function saveOrderToFirebase() {
         });
 }
 
-document.getElementById("enableNotifyBtn").onclick = async () => {
-    const perm = await Notification.requestPermission();
-
-    if (perm === "granted") {
-        localStorage.setItem("notifyAllowed", "yes");
-        document.getElementById("notifyBlocker").classList.add("hidden");
-    } else {
-        alert("Notification Allow না করলে অ্যাপ ব্যবহার করা যাবে না!");
-    }
-};
-checkNotificationPermission();
-
-if (Notification.permission === "granted") {
-    db.ref("notifications").limitToLast(1).on("child_added", snap => {
-        const data = snap.val();
-
-        new Notification("📂 New Folder Added", {
-            body: `নতুন একটি ফোল্ডার অ্যাড করা হয়েছে MY FAMILY PHOTO তে\n"${data.title}"`
-        });
-    });
-}
-
-function requestNotify() {
-
-    if (isInAppBrowser()) {
-        alert("⚠️ অনুগ্রহ করে Chrome বা Browser এ খুলুন\nতাহলেই Notification কাজ করবে");
-        return;
-    }
-
-    if (!("Notification" in window)) {
-        alert("এই ব্রাউজার Notification সাপোর্ট করে না");
-        return;
-    }
-
-    Notification.requestPermission().then(permission => {
-        if (permission === "granted") {
-            localStorage.setItem("notifyAllowed", "yes");
-            document.getElementById("notifyBlocker").classList.add("hidden");
-            alert("Notification Enabled ✅");
-        } else {
-            alert("Notification Allow না করলে অ্যাপ ব্যবহার করা যাবে না!");
-        }
-    });
-}
-
-
-function isInAppBrowser() {
-    let ua = navigator.userAgent || navigator.vendor;
-    return /FBAN|FBAV|Instagram|Line|Twitter|WhatsApp|Telegram|Messenger/i.test(ua);
-}
-
-
 
 // EXPORT
 window.showAdminLogin = showAdminLogin;
@@ -418,9 +346,6 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
-
-
-
 
 
 
