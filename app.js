@@ -144,6 +144,8 @@ function addFile() {
 
     showMessage("addFileMsg", "File Added!");
     loadFilesForAdmin();
+    sendNotification(title);
+
 }
 
 // ---------------------------
@@ -333,6 +335,23 @@ function saveOrderToFirebase() {
             db.ref("files/" + key + "/order").set(index);
         });
 }
+function sendNotification(folderName) {
+    fetch("https://onesignal.com/api/v1/notifications", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Basic YOUR_REST_API_KEY"
+        },
+        body: JSON.stringify({
+            app_id: "6ea79374-32d7-4ea5-ba53-bbb92ac7754d",
+            included_segments: ["All"],
+            headings: { en: "MY FAMILY PHOTO" },
+            contents: {
+                en: `নতুন একটি ফোল্ডার এড করা হয়েছে MY FAMILY PHOTO অ্যাপ এ '${folderName}'`
+            }
+        })
+    });
+}
 
 
 // EXPORT
@@ -346,6 +365,7 @@ window.openSecureLink = openSecureLink;
 window.searchFiles = searchFiles;
 window.logout = logout;
 window.showHome = showHome;
+
 
 
 
