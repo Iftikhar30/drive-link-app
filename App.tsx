@@ -197,7 +197,7 @@ const App: React.FC = () => {
         setAuthStatus('user');
         setLoginMsg({ text: '', type: '' });
       } else {
-        setLoginMsg({ text: 'ভুল পাসওয়ার্ড!', type: 'error' });
+        setLoginMsg({ text: 'à¦­à§à¦² à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡!', type: 'error' });
       }
     });
   };
@@ -223,12 +223,12 @@ const App: React.FC = () => {
 
   const handleUpdatePassword = () => {
     if (!newPassInput.trim() || newPassInput.length < 4) {
-      setPassUpdateMsg({ text: 'পাসওয়ার্ড ন্যূনতম ৪ অক্ষরের হতে হবে', type: 'error' });
+      setPassUpdateMsg({ text: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦¨à§à¦¯à§‚à¦¨à¦¤à¦® à§ª à¦…à¦•à§à¦·à¦°à§‡à¦° à¦¹à¦¤à§‡ à¦¹à¦¬à§‡', type: 'error' });
       return;
     }
     firebase.database().ref("settings/userPassword").set(newPassInput)
       .then(() => {
-        setPassUpdateMsg({ text: 'পাসওয়ার্ড আপডেট সফল!', type: 'success' });
+        setPassUpdateMsg({ text: 'à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦†à¦ªà¦¡à§‡à¦Ÿ à¦¸à¦«à¦²!', type: 'success' });
         setNewPassInput('');
       })
       .catch((err: any) => setPassUpdateMsg({ text: err.message, type: 'error' }));
@@ -254,7 +254,7 @@ const App: React.FC = () => {
   };
 
   const handleSaveFolder = () => {
-    if (!folderForm.name.trim()) return alert("ফোল্ডার নাম আবশ্যক");
+    if (!folderForm.name.trim()) return alert("à¦«à§‹à¦²à§à¦¡à¦¾à¦° à¦¨à¦¾à¦® à¦†à¦¬à¦¶à§à¦¯à¦•");
     const db = firebase.database();
     const encodedMainLink = folderForm.mainLink ? btoa(folderForm.mainLink) : "";
     const folderData = {
@@ -297,14 +297,14 @@ const App: React.FC = () => {
           {authStatus === 'logged-out' ? (
             <>
               <h2 className="text-orange-500 font-bold uppercase tracking-widest text-[10px] mb-2">Welcome</h2>
-              <h1 className="text-2xl font-bold text-white mb-8 tracking-tight">আমার ভাবনাগুলোতে</h1>
+              <h1 className="text-2xl font-bold text-white mb-8 tracking-tight">à¦†à¦®à¦¾à¦° à¦­à¦¾à¦¬à¦¨à¦¾à¦—à§à¦²à§‹à¦¤à§‡</h1>
               
               <div className="space-y-6">
                 <div className="relative">
                   <Lock className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                   <input 
                     type="password" 
-                    placeholder="পাসওয়ার্ড দিন..." 
+                    placeholder="à¦ªà¦¾à¦¸à¦“à§Ÿà¦¾à¦°à§à¦¡ à¦¦à¦¿à¦¨..." 
                     className="w-full bg-[#0f172a] border border-white/10 rounded-full py-4 px-6 text-white outline-none focus:ring-2 focus:ring-orange-500 transition-all text-sm"
                     value={userPasswordInput}
                     onChange={(e) => setUserPasswordInput(e.target.value)}
@@ -349,7 +349,7 @@ const App: React.FC = () => {
   // --- Main App Content ---
   if (authStatus === 'user') {
     return (
-      <div className="min-h-screen w-full bg-[#f6f8fb] flex flex-col font-sans page-enter overflow-hidden">
+      <div className="min-h-screen w-full bg-[#f6f8fb] flex flex-col font-sans page-enter">
         <header className="bg-white px-4 py-4 sm:px-6 flex items-center justify-between shadow-sm sticky top-0 z-20">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-600 rounded-lg active:bg-slate-100 transition-colors"><Menu size={24} /></button>
           <h3 className="font-bold text-base sm:text-lg text-slate-800 tracking-tight truncate max-w-[60%]">{activeFolder ? activeFolder.name : 'My Drive'}</h3>
@@ -406,7 +406,7 @@ const App: React.FC = () => {
 
   if (authStatus === 'admin') {
     return (
-      <div className="min-h-screen w-full bg-[#f8fafc] flex flex-col font-sans page-enter overflow-hidden">
+      <div className="min-h-screen w-full bg-[#f8fafc] flex flex-col font-sans page-enter">
         <header className="h-16 sm:h-20 bg-white border-b border-slate-100 flex items-center justify-between px-4 sm:px-10 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500 hover:bg-slate-50 rounded-lg transition-all"><Menu size={22} /></button>
