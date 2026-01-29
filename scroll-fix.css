@@ -1,0 +1,32 @@
+/* === GLOBAL SCROLL FIX === */
+
+/* HTML & BODY */
+html, body {
+  width: 100%;
+  height: auto !important;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+/* React root */
+#root {
+  min-height: 100vh;
+  overflow-y: auto !important;
+}
+
+/* Safety: any accidental overflow hidden remove */
+body[style*="overflow"] {
+  overflow-y: auto !important;
+}
+
+/* Allow scroll inside all main containers */
+main, section, div {
+  max-height: none;
+}
+
+/* Mobile smooth scrolling */
+* {
+  -webkit-overflow-scrolling: touch;
+}
